@@ -20,9 +20,11 @@ simple IoT extends Node {
 }
 
 simple Edge extends Node {
+    parameters:
+        @class(Edge);
+        volatile double syncTime @unit(s) = default(10s);
     gates:
         inout iot_port[];
-        inout subp_port;
         inout pnode_port;
 }
 
@@ -73,7 +75,7 @@ network m2Clock {
             pnode.subp_port[i] <--> { delay = 100ms; } <--> subp[i].pnode_port;
         }
         for i=0..subp_n*12-1 {
-            subp[int(i/16)].edge_port[i] <--> { delay = 10ms; } <--> edge[i].subp_port;
+            subp[int(i/16)].edge_port[i] <--> { delay = 10ms; } <--> edge[i].pnode_port;
         }
         for i=subp_n*12..edge_n-1 {
             pnode.edge_port[i] <--> { delay = 100ms; } <--> edge[i].pnode_port;

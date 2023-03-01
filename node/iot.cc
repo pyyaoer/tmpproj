@@ -1,8 +1,13 @@
 #define FSM_DEBUG
 #include "node.h"
 
+IoT::IoT() {
+    startStopBurst = sendMessage = nullptr;
+}
+
 IoT::~IoT() {
-    cancelAndDelete(newTaskEvent);
+    cancelAndDelete(startStopBurst);
+    cancelAndDelete(sendMessage);
 }
 
 void IoT::initialize() {
@@ -38,22 +43,14 @@ void IoT::processTimer(cMessage *msg) {
             // schedule end of sleep period (start of next burst)
             d = sleepTime->doubleValue();
             scheduleAt(simTime() + d, startStopBurst);
-
-            // display message, restore normal icon color
             EV << "sleeping for " << d << "s\n";
-//            bubble("burst ended, sleeping");
-//            getDisplayString().setTagArg("i", 1, "");
             break;
 
         case FSM_Exit(SLEEP):
             // schedule end of this burst
             d = burstTime->doubleValue();
             scheduleAt(simTime() + d, startStopBurst);
-
-            // display message, turn icon yellow
             EV << "starting burst of duration " << d << "s\n";
-//            bubble("burst started");
-//            getDisplayString().setTagArg("i", 1, "yellow");
 
             // transition to ACTIVE state:
             if (msg != startStopBurst)

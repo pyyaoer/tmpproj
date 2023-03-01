@@ -44,8 +44,39 @@ protected:
 
     void generateTask();
 
+public:
+    IoT();
     virtual ~IoT();
     void initialize() override;
 };
 
 Define_Module(IoT);
+
+class Edge : public Node {
+    cPar *syncTime;
+    cMessage *syncMessage;
+
+    // state
+    cFSM fsm;
+    enum {
+        INIT = 0,
+        SLEEP = FSM_Steady(1),
+        SYNC = FSM_Transient(1),
+    };
+
+protected:
+    int tenant_id;
+
+    virtual void handleMessage(cMessage *msg) override;
+    virtual void processTimer(cMessage *msg);
+    void processMessage(cMessage *msg);
+
+    void sync();
+
+public:
+    Edge();
+    virtual ~Edge();
+    void initialize() override;
+};
+
+Define_Module(Edge);

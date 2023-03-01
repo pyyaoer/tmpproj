@@ -34,7 +34,7 @@ PROJECTRELATIVE_PATH =
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
-OBJS = $O/node/iot.o $O/node/node.o
+OBJS = $O/node/edge.o $O/node/iot.o $O/node/node.o
 
 # Message files
 MSGFILES =
