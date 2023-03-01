@@ -5,15 +5,11 @@ using namespace omnetpp;
 
 class Node : public cSimpleModule {
 protected:
-    int counter;
-    cMessage *event;
-    cMessage *tictocMsg;
-    cMessage *newTaskEvent;
-    virtual void initialize() override;
-    virtual void handleMessage(cMessage *msg) override;
+    virtual void initialize() override {};
+    virtual void handleMessage(cMessage *msg) override {};
 public:
-    Node();
-    virtual ~Node();
+    Node() {}
+    virtual ~Node() {};
 };
 
 Define_Module(Node);
@@ -94,3 +90,18 @@ public:
 };
 
 Define_Module(PNode);
+
+class SubPNode : public Node {
+
+protected:
+
+    virtual void handleMessage(cMessage *msg) override;
+    void processMessage(cMessage *msg);
+
+public:
+    SubPNode();
+    virtual ~SubPNode();
+    void initialize() override;
+};
+
+Define_Module(SubPNode);

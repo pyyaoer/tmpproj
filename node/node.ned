@@ -3,9 +3,6 @@ package node;
 simple Node {
     parameters:
         int id;
-        bool sendMsgOnInit = default(false);
-        int limit = default(2);
-        //volatile double delayTime @unit(s);
         @display("i=block/routing");
 }
 
@@ -29,6 +26,8 @@ simple Edge extends Node {
 }
 
 simple SubPNode extends Node {
+    parameters:
+        @class(SubPNode);
     gates:
         inout edge_port[];
         inout pnode_port;
