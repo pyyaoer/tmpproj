@@ -1,33 +1,24 @@
+#define FSM_DEBUG
 #include "node.h"
-
-class IoT : public Node {
-
-protected:
-    int tenant_id;
-
-    virtual void handleMessage(cMessage *msg) override;
-    virtual void processTimer(cMessage *msg);
-    void processMessage(cMessage *msg);
-
-    void generateTask();
-
-    virtual ~IoT();
-    void initialize() override;
-};
-
-Define_Module(IoT);
 
 IoT::~IoT() {
     cancelAndDelete(newTaskEvent);
 }
 
 void IoT::initialize() {
-    newTaskEvent = new cMessage();
-    scheduleAt(1, newTaskEvent);
+    fsm.setName("fsm");
+
+    sleepTime = &par("sleepTime");
+    burstTime = &par("burstTime");
+    sendIATime = &par("sendIaTime");
+
+    startStopBurst = new cMessage("startStopBurst");
+    sendMessage = new cMessage("sendMessage");
+
+    scheduleAt(0, startStopBurst);
 }
 
-void IoT::handleMessage(cMessage *msg)
-{
+void IoT::handleMessage(cMessage *msg) {
     // process the self-message or incoming packet
     if (msg->isSelfMessage())
         processTimer(msg);
@@ -36,6 +27,69 @@ void IoT::handleMessage(cMessage *msg)
 }
 
 void IoT::processTimer(cMessage *msg) {
+    simtime_t d;
+    FSM_Switch(fsm) {
+        case FSM_Exit(INIT):
+            // transition to SLEEP state
+            FSM_Goto(fsm, SLEEP);
+            break;
+
+        case FSM_Enter(SLEEP):
+            // schedule end of sleep period (start of next burst)
+            d = sleepTime->doubleValue();
+            scheduleAt(simTime() + d, startStopBurst);
+
+            // display message, restore normal icon color
+            EV << "sleeping for " << d << "s\n";
+//            bubble("burst ended, sleeping");
+//            getDisplayString().setTagArg("i", 1, "");
+            break;
+
+        case FSM_Exit(SLEEP):
+            // schedule end of this burst
+            d = burstTime->doubleValue();
+            scheduleAt(simTime() + d, startStopBurst);
+
+            // display message, turn icon yellow
+            EV << "starting burst of duration " << d << "s\n";
+//            bubble("burst started");
+//            getDisplayString().setTagArg("i", 1, "yellow");
+
+            // transition to ACTIVE state:
+            if (msg != startStopBurst)
+                throw cRuntimeError("invalid event in state ACTIVE");
+            FSM_Goto(fsm, ACTIVE);
+            break;
+
+        case FSM_Enter(ACTIVE):
+            // schedule next sending
+            d = sendIATime->doubleValue();
+            EV << "next sending in " << d << "s\n";
+            scheduleAt(simTime() + d, sendMessage);
+            break;
+
+        case FSM_Exit(ACTIVE):
+            // transition to either SEND or SLEEP
+            if (msg == sendMessage) {
+                FSM_Goto(fsm, SEND);
+            }
+            else if (msg == startStopBurst) {
+                cancelEvent(sendMessage);
+                FSM_Goto(fsm, SLEEP);
+            }
+            else
+                throw cRuntimeError("invalid event in state ACTIVE");
+            break;
+
+        case FSM_Exit(SEND): {
+            // send out a packet
+            generateTask();
+
+            // return to ACTIVE
+            FSM_Goto(fsm, ACTIVE);
+            break;
+        }
+    }
 }
 
 void IoT::processMessage(cMessage *msg) {
@@ -44,6 +98,6 @@ void IoT::processMessage(cMessage *msg) {
 void IoT::generateTask() {
     // generate and send out a packet
     cMessage *msg = new cMessage();
-    send(msg, "out");
+    send(msg, "edge_port$o");
 }
 
