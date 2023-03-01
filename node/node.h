@@ -65,7 +65,6 @@ class Edge : public Node {
     };
 
 protected:
-    int tenant_id;
 
     virtual void handleMessage(cMessage *msg) override;
     virtual void processTimer(cMessage *msg);
@@ -80,3 +79,18 @@ public:
 };
 
 Define_Module(Edge);
+
+class PNode : public Node {
+
+protected:
+
+    virtual void handleMessage(cMessage *msg) override;
+    void processMessage(cMessage *msg);
+
+public:
+    PNode();
+    virtual ~PNode();
+    void initialize() override;
+};
+
+Define_Module(PNode);

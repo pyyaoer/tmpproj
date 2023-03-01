@@ -35,6 +35,8 @@ simple SubPNode extends Node {
 }
 
 simple PNode extends Node {
+    parameters:
+        @class(PNode);
     gates:
         inout edge_port[];
         inout subp_port[];
