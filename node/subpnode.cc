@@ -8,7 +8,7 @@ SubPNode::~SubPNode() {
 }
 
 void SubPNode::initialize() {
-
+    id = par("id").intValue();
 }
 
 void SubPNode::handleMessage(cMessage *msg) {

@@ -1,10 +1,15 @@
 #include <string.h>
 #include <omnetpp.h>
 
+#include "NodeMessage_m.h"
+
 using namespace omnetpp;
+
+#define TENANT_NUM 8
 
 class Node : public cSimpleModule {
 protected:
+    int id;
     virtual void initialize() override {};
     virtual void handleMessage(cMessage *msg) override {};
 public:
@@ -49,6 +54,8 @@ public:
 Define_Module(IoT);
 
 class Edge : public Node {
+    double delta[TENANT_NUM];
+    double rho[TENANT_NUM];
     cPar *syncTime;
     cMessage *syncMessage;
 
@@ -64,7 +71,7 @@ protected:
 
     virtual void handleMessage(cMessage *msg) override;
     virtual void processTimer(cMessage *msg);
-    void processMessage(cMessage *msg);
+    void processMessage(TaskMessage *msg);
 
     void sync();
 

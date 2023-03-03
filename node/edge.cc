@@ -1,7 +1,7 @@
 #define FSM_DEBUG
 #include "node.h"
 
-Edge::Edge() {
+Edge::Edge() : Node() {
     syncMessage = nullptr;
 }
 
@@ -12,6 +12,11 @@ Edge::~Edge() {
 void Edge::initialize() {
     fsm.setName("fsm");
 
+    for (int i = 0; i < TENANT_NUM; ++i) {
+        delta[i] = rho[i] = 1;
+    }
+
+    id = par("id").intValue();
     syncTime = &par("syncTime");
     syncMessage = new cMessage("syncMessage");
 
@@ -23,7 +28,7 @@ void Edge::handleMessage(cMessage *msg) {
     if (msg->isSelfMessage())
         processTimer(msg);
     else
-        processMessage(msg);
+        processMessage(check_and_cast<TaskMessage *>(msg));
 }
 
 void Edge::processTimer(cMessage *msg) {
@@ -57,7 +62,8 @@ void Edge::processTimer(cMessage *msg) {
     }
 }
 
-void Edge::processMessage(cMessage *msg) {
+void Edge::processMessage(TaskMessage *msg) {
+    EV << id << " received task from IoT " << msg->getIot_id() << "\n";
 }
 
 void Edge::sync() {

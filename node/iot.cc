@@ -13,6 +13,9 @@ IoT::~IoT() {
 void IoT::initialize() {
     fsm.setName("fsm");
 
+    id = par("id").intValue();
+    tenant_id = par("id").intValue() % TENANT_NUM;
+
     sleepTime = &par("sleepTime");
     burstTime = &par("burstTime");
     sendIATime = &par("sendIaTime");
@@ -94,7 +97,9 @@ void IoT::processMessage(cMessage *msg) {
 
 void IoT::generateTask() {
     // generate and send out a packet
-    cMessage *msg = new cMessage();
+    TaskMessage *msg = new TaskMessage();
+    msg->setIot_id(id);
+    msg->setTenant_id(tenant_id);
     send(msg, "edge_port$o");
 }
 

@@ -8,7 +8,7 @@ PNode::~PNode() {
 }
 
 void PNode::initialize() {
-
+    id = par("id").intValue();
 }
 
 void PNode::handleMessage(cMessage *msg) {
