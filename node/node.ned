@@ -8,7 +8,7 @@ simple Node {
 
 simple IoT extends Node {
     parameters:
-	    @class(IoT);
+        @class(IoT);
         volatile double sleepTime @unit(s) = default(1s);
         volatile double burstTime @unit(s) = default(1s);
         volatile double sendIaTime @unit(s) = default(exponential(1s));
@@ -52,20 +52,20 @@ network m2Clock {
             parameters:
                 id = 0;
             gates:
-                edge_port[edge_n];
-                subp_port[subp_n];
+                edge_port[parent.edge_n];
+                subp_port[parent.subp_n];
         }
         subp[subp_n]: SubPNode {
             parameters:
                 id = index;
             gates:
-                edge_port[edge_n];
+                edge_port[parent.edge_n];
         }
         edge[edge_n]: Edge {
             parameters:
                 id = index;
             gates:
-                iot_port[iot_n];
+                iot_port[parent.iot_n];
         }
         iot[iot_n]: IoT {
             parameters:
@@ -73,15 +73,15 @@ network m2Clock {
         }
     connections allowunconnected:
         for i=0..subp_n-1 {
-            pnode.subp_port[i] <--> { delay = 100ms; } <--> subp[i].pnode_port;
+            pnode.subp_port[i] <--> {  delay = 100ms; } <--> subp[i].pnode_port;
         }
         for i=0..subp_n*12-1 {
-            subp[int(i/16)].edge_port[i] <--> { delay = 10ms; } <--> edge[i].pnode_port;
+            subp[int(i/16)].edge_port[i] <--> {  delay = 10ms; } <--> edge[i].pnode_port;
         }
         for i=subp_n*12..edge_n-1 {
-            pnode.edge_port[i] <--> { delay = 100ms; } <--> edge[i].pnode_port;
+            pnode.edge_port[i] <--> {  delay = 100ms; } <--> edge[i].pnode_port;
         }
         for i=0..iot_n-1 {
-            edge[int(i/2)].iot_port[i] <--> { delay = 5ms; } <--> iot[i].edge_port;
+            edge[int(i/2)].iot_port[i] <--> {  delay = 5ms; } <--> iot[i].edge_port;
         }
 }

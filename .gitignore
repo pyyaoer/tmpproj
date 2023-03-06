@@ -1,4 +1,5 @@
 out
+results
 *.exe
 */*_m.cc
 */*_m.h
