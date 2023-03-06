@@ -71,7 +71,7 @@ protected:
 
     virtual void handleMessage(cMessage *msg) override;
     virtual void processTimer(cMessage *msg);
-    void processMessage(TaskMessage *msg);
+    void processMessage(BaseMessage *msg);
 
     void sync();
 

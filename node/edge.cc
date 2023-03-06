@@ -28,7 +28,7 @@ void Edge::handleMessage(cMessage *msg) {
     if (msg->isSelfMessage())
         processTimer(msg);
     else
-        processMessage(check_and_cast<TaskMessage *>(msg));
+        processMessage(check_and_cast<BaseMessage *>(msg));
 }
 
 void Edge::processTimer(cMessage *msg) {
@@ -59,11 +59,16 @@ void Edge::processTimer(cMessage *msg) {
             FSM_Goto(fsm, SLEEP);
             break;
         }
-    }
+    };
 }
 
-void Edge::processMessage(TaskMessage *msg) {
-    EV << id << " received task from IoT " << msg->getIot_id() << "\n";
+void Edge::processMessage(BaseMessage *msg) {
+    switch (msg->getType()) {
+        case TASK_MESSAGE:
+            TaskMessage *taskmsg = check_and_cast<TaskMessage *>(msg);
+            EV << id << " received task from IoT " << taskmsg->getIot_id() << "\n";
+            break;
+    }
 }
 
 void Edge::sync() {

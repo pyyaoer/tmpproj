@@ -89,7 +89,7 @@ void IoT::processTimer(cMessage *msg) {
             FSM_Goto(fsm, ACTIVE);
             break;
         }
-    }
+    };
 }
 
 void IoT::processMessage(cMessage *msg) {
@@ -98,6 +98,7 @@ void IoT::processMessage(cMessage *msg) {
 void IoT::generateTask() {
     // generate and send out a packet
     TaskMessage *msg = new TaskMessage();
+    msg->setType(TASK_MESSAGE);
     msg->setIot_id(id);
     msg->setTenant_id(tenant_id);
     send(msg, "edge_port$o");
