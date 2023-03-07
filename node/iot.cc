@@ -31,7 +31,7 @@ void IoT::handleMessage(cMessage *msg) {
     if (msg->isSelfMessage())
         processTimer(msg);
     else
-        processMessage(msg);
+        processMessage(check_and_cast<BaseMessage *>(msg));
 }
 
 void IoT::processTimer(cMessage *msg) {
@@ -92,7 +92,16 @@ void IoT::processTimer(cMessage *msg) {
     };
 }
 
-void IoT::processMessage(cMessage *msg) {
+void IoT::processMessage(BaseMessage *msg) {
+    CompMessage *cmsg;
+    switch (msg->getType()) {
+        case COMP_MESSAGE:
+            cmsg = check_and_cast<CompMessage *>(msg);
+            EV << "Task completed in " << cmsg->getArrivalTime()-cmsg->getCreation() << " seconds.\n";
+            break;
+        default:
+            break;
+    }
 }
 
 void IoT::generateTask() {

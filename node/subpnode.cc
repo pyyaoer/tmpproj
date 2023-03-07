@@ -12,9 +12,9 @@ void SubPNode::initialize() {
 }
 
 void SubPNode::handleMessage(cMessage *msg) {
-    processMessage(msg);
+    processMessage(check_and_cast<BaseMessage *>(msg));
 }
 
-void SubPNode::processMessage(cMessage *msg) {
+void SubPNode::processMessage(BaseMessage *msg) {
 }
 

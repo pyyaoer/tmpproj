@@ -41,7 +41,7 @@ protected:
 
     virtual void handleMessage(cMessage *msg) override;
     virtual void processTimer(cMessage *msg);
-    void processMessage(cMessage *msg);
+    void processMessage(BaseMessage *msg);
 
     void generateTask();
 
@@ -56,6 +56,8 @@ Define_Module(IoT);
 class Edge : public Node {
     double delta[TENANT_NUM];
     double rho[TENANT_NUM];
+    int r_req[TENANT_NUM];
+    int l_req[TENANT_NUM];
     cPar *syncTime;
     cMessage *syncMessage;
 
@@ -88,7 +90,7 @@ class PNode : public Node {
 protected:
 
     virtual void handleMessage(cMessage *msg) override;
-    void processMessage(cMessage *msg);
+    void processMessage(BaseMessage *msg);
 
 public:
     PNode();
@@ -103,7 +105,7 @@ class SubPNode : public Node {
 protected:
 
     virtual void handleMessage(cMessage *msg) override;
-    void processMessage(cMessage *msg);
+    void processMessage(BaseMessage *msg);
 
 public:
     SubPNode();

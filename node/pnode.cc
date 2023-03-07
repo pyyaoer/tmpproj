@@ -12,9 +12,9 @@ void PNode::initialize() {
 }
 
 void PNode::handleMessage(cMessage *msg) {
-    processMessage(msg);
+    processMessage(check_and_cast<BaseMessage *>(msg));
 }
 
-void PNode::processMessage(cMessage *msg) {
+void PNode::processMessage(BaseMessage *msg) {
 }
 

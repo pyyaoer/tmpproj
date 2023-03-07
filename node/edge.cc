@@ -63,16 +63,32 @@ void Edge::processTimer(cMessage *msg) {
 }
 
 void Edge::processMessage(BaseMessage *msg) {
+    TaskMessage* tmsg;
+    TagMessage* tgmsg;
+    int i;
     switch (msg->getType()) {
         case TASK_MESSAGE:
-            TaskMessage *taskmsg = check_and_cast<TaskMessage *>(msg);
-            EV << id << " received task from IoT " << taskmsg->getIot_id() << "\n";
+            tmsg = check_and_cast<TaskMessage *>(msg);
+            EV << id << " received task from IoT " << tmsg->getIot_id() << "\n";
+            break;
+        case TAG_MESSAGE:
+            tgmsg = check_and_cast<TagMessage *>(msg);
+            for (i=0; i<TENANT_NUM; ++i) {
+                rho[i] = tgmsg->getRho(i);
+                delta[i] = tgmsg->getDelta(i);
+            }
+            break;
+        default:
             break;
     }
 }
 
 void Edge::sync() {
-    cMessage *msg = new cMessage();
+    SyncMessage *msg = new SyncMessage();
+    for (int i=0; i<TENANT_NUM; ++i) {
+        msg->setR(i, r_req[i]);
+        msg->setL(i, l_req[i]);
+    }
     send(msg, "pnode_port$o");
 }
 
