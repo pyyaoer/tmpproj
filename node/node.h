@@ -1,11 +1,7 @@
 #include <string.h>
-#include <omnetpp.h>
 
+#include "util.h"
 #include "NodeMessage_m.h"
-
-using namespace omnetpp;
-
-#define TENANT_NUM 8
 
 class Node : public cSimpleModule {
 protected:
@@ -56,8 +52,8 @@ Define_Module(IoT);
 class Edge : public Node {
     double delta[TENANT_NUM];
     double rho[TENANT_NUM];
-    int r_req[TENANT_NUM];
-    int l_req[TENANT_NUM];
+    double r_req[TENANT_NUM];
+    double l_req[TENANT_NUM];
     cPar *syncTime;
     cMessage *syncMessage;
 
@@ -85,24 +81,22 @@ public:
 
 Define_Module(Edge);
 
-class PNode : public Node {
+class PNodeBase : public Node {
 
 protected:
+    std::vector<Records> record_r_;
+    std::vector<Records> record_l_;
 
-    virtual void handleMessage(cMessage *msg) override;
-    void processMessage(BaseMessage *msg);
-
-    void sync(int gate_id);
+    void sync(SyncMessage *smsg);
 
 public:
-    PNode();
-    virtual ~PNode();
-    void initialize() override;
+    PNodeBase();
+    virtual ~PNodeBase();
 };
 
-Define_Module(PNode);
+Define_Module(PNodeBase);
 
-class SubPNode : public Node {
+class SubPNode : public PNodeBase {
 
 protected:
 
@@ -116,3 +110,17 @@ public:
 };
 
 Define_Module(SubPNode);
+
+class PNode : public PNodeBase {
+
+protected:
+    virtual void handleMessage(cMessage *msg) override;
+    void processMessage(BaseMessage *msg);
+
+public:
+    PNode();
+    virtual ~PNode();
+    void initialize() override;
+};
+
+Define_Module(PNode);

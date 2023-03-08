@@ -25,19 +25,22 @@ simple Edge extends Node {
         inout pnode_port;
 }
 
-simple SubPNode extends Node {
+simple PNodeBase extends Node {
+    gates:
+        inout edge_port[];
+}
+
+simple SubPNode extends PNodeBase {
     parameters:
         @class(SubPNode);
     gates:
-        inout edge_port[];
         inout pnode_port;
 }
 
-simple PNode extends Node {
+simple PNode extends PNodeBase {
     parameters:
         @class(PNode);
     gates:
-        inout edge_port[];
         inout subp_port[];
 }
 

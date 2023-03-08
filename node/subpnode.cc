@@ -1,7 +1,7 @@
 #define FSM_DEBUG
 #include "node.h"
 
-SubPNode::SubPNode() {
+SubPNode::SubPNode() : PNodeBase() {
 }
 
 SubPNode::~SubPNode() {
@@ -16,6 +16,13 @@ void SubPNode::handleMessage(cMessage *msg) {
 }
 
 void SubPNode::processMessage(BaseMessage *msg) {
+    SyncMessage *smsg;
+    switch (msg->getType()) {
+        case SYNC_MESSAGE:
+            sync(check_and_cast<SyncMessage *>(msg));
+            break;
+        default:
+            break;
+    }
     delete msg;
 }
-

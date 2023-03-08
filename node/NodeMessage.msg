@@ -20,12 +20,13 @@ packet CompMessage extends BaseMessage {
 
 packet SyncMessage extends BaseMessage {
     int gate_id;
+    double period;
     int r[32];
     int l[32];
 }
 
 packet TagMessage extends BaseMessage {
-    int rho[32];
-    int delta[32];
+    double rho[32];
+    double delta[32];
 }
 

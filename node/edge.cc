@@ -13,7 +13,7 @@ void Edge::initialize() {
     fsm.setName("fsm");
 
     for (int i = 0; i < TENANT_NUM; ++i) {
-        delta[i] = rho[i] = 1;
+        delta[i] = rho[i] = GATE_NUM;
     }
 
     id = par("id").intValue();
@@ -42,7 +42,7 @@ void Edge::processTimer(cMessage *msg) {
         case FSM_Enter(SLEEP):
             // schedule end of sleep period (start of next sync)
             d = syncTime->doubleValue();
-            //scheduleAt(simTime() + d, syncMessage);
+            scheduleAt(simTime() + d, syncMessage);
             break;
 
         case FSM_Exit(SLEEP):
@@ -86,7 +86,9 @@ void Edge::processMessage(BaseMessage *msg) {
 
 void Edge::sync() {
     SyncMessage *msg = new SyncMessage();
+    msg->setType(SYNC_MESSAGE);
     msg->setGate_id(id);
+    msg->setPeriod(syncTime->doubleValue());
     for (int i=0; i<TENANT_NUM; ++i) {
         msg->setR(i, r_req[i]);
         msg->setL(i, l_req[i]);
