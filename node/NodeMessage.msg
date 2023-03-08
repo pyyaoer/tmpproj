@@ -19,6 +19,7 @@ packet CompMessage extends BaseMessage {
 }
 
 packet SyncMessage extends BaseMessage {
+    int gate_id;
     int r[32];
     int l[32];
 }

@@ -92,6 +92,8 @@ protected:
     virtual void handleMessage(cMessage *msg) override;
     void processMessage(BaseMessage *msg);
 
+    void sync(int gate_id);
+
 public:
     PNode();
     virtual ~PNode();

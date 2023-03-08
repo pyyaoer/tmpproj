@@ -102,6 +102,7 @@ void IoT::processMessage(BaseMessage *msg) {
         default:
             break;
     }
+    delete msg;
 }
 
 void IoT::generateTask() {

@@ -81,10 +81,12 @@ void Edge::processMessage(BaseMessage *msg) {
         default:
             break;
     }
+    delete msg;
 }
 
 void Edge::sync() {
     SyncMessage *msg = new SyncMessage();
+    msg->setGate_id(id);
     for (int i=0; i<TENANT_NUM; ++i) {
         msg->setR(i, r_req[i]);
         msg->setL(i, l_req[i]);

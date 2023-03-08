@@ -16,5 +16,6 @@ void SubPNode::handleMessage(cMessage *msg) {
 }
 
 void SubPNode::processMessage(BaseMessage *msg) {
+    delete msg;
 }
 
