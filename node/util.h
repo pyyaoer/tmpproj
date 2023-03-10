@@ -9,29 +9,21 @@ using namespace omnetpp;
 class Records {
     class Record {
     public:
-        simtime_t start;
-        simtime_t end;
-        int cnt;
-        Record() : Record(0, 0, -1) {}
-        explicit Record(simtime_t s, simtime_t e, int c)
-        : start(s), end(e), cnt(c) {}
+        simtime_t period;
+        double cnt;
+        Record() : Record(0, -1) {}
+        explicit Record(simtime_t p, int c)
+        : period(p), cnt(c) {}
     };
 public:
     std::vector<Record> records;
     explicit Records() : records(GATE_NUM) {}
-    int UpdateAndCount(int gate, int cnt, simtime_t start, simtime_t end) {
-        records[gate] = Record(start, end, cnt);
-        int s = 0;
+    int UpdateAndCount(int gate, int cnt, double period) {
+        records[gate] = Record(period, cnt);
+        double s = 0;
         for (auto r : records) {
-            if (r.cnt < 0) continue;
-            if (start <= r.start and r.end <= end) {
-                s += r.cnt;
-            }
-            else if (start <= r.end and r.end <= end) {
-                // Assume that the requests follow a uniform distribution
-                s += r.cnt * (r.end-start) / (r.end-r.start);
-            }
+            s += r.cnt / r.period;
         }
-        return s;
+        return s * period;
     }
 };
