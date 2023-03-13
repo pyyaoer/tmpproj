@@ -11,6 +11,7 @@ Edge::~Edge() {
 
 void Edge::initialize() {
     fsm.setName("fsm");
+    fsm.setState(INIT);
 
     for (int i = 0; i < TENANT_NUM; ++i) {
         delta[i] = rho[i] = GATE_NUM;
@@ -92,6 +93,7 @@ void Edge::sync() {
     for (int i=0; i<TENANT_NUM; ++i) {
         msg->setR(i, r_req[i]);
         msg->setL(i, l_req[i]);
+        r_req[i] = l_req[i] = 0;
     }
     send(msg, "pnode_port$o");
 }
