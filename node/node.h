@@ -124,3 +124,34 @@ public:
 };
 
 Define_Module(PNode);
+
+class Executor : public cSimpleModule {
+
+    cMessage *doneMessage;
+    cMessage *scanMessage;
+    cMessage *waitMessage;
+
+    simtime_t scan_interval;
+    simtime_t duration;
+
+    cFSM fsm;
+    enum {
+        INIT = 0,
+        WAITING = FSM_Steady(1),
+        RUNNING = FSM_Steady(2),
+        FINDING = FSM_Transient(1),
+    };
+protected:
+    virtual void initialize() override;
+    virtual void handleMessage(cMessage *msg) override;
+
+public:
+    Executor() {};
+    ~Executor() {
+        delete doneMessage;
+        delete scanMessage;
+        delete waitMessage;
+    };
+};
+
+Define_Module(Executor);

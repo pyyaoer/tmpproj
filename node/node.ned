@@ -6,6 +6,11 @@ simple Node {
         @display("i=block/routing");
 }
 
+simple Executor {
+    gates:
+        inout host_port;
+}
+
 simple IoT extends Node {
     parameters:
         @class(IoT);
@@ -16,13 +21,21 @@ simple IoT extends Node {
         inout edge_port;
 }
 
-simple Edge extends Node {
+module Edge extends Node {
     parameters:
         @class(Edge);
         volatile double syncTime @unit(s) = default(10s);
+        int exe_n = default(8);
     gates:
         inout iot_port[];
         inout pnode_port;
+        inout executor_port[exe_n];
+    submodules:
+        executor[exe_n]: Executor;
+    connections:
+        for i=0..exe_n-1 {
+            executor[i].host_port <--> executor_port[i];
+        }
 }
 
 simple PNodeBase extends Node {

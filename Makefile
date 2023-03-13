@@ -35,6 +35,7 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 # Object files for local .cc, .msg and .sm files
 OBJS = \
     $O/node/edge.o \
+    $O/node/executor.o \
     $O/node/iot.o \
     $O/node/pnode.o \
     $O/node/pnodebase.o \
