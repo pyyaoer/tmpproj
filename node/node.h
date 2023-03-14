@@ -50,6 +50,8 @@ public:
 Define_Module(IoT);
 
 class Edge : public Node {
+    friend class Executor;
+
     double delta[TENANT_NUM];
     double rho[TENANT_NUM];
     double r_req[TENANT_NUM];
@@ -72,6 +74,7 @@ protected:
     void processMessage(BaseMessage *msg);
 
     void sync();
+    int scan();
 
 public:
     Edge();
@@ -142,7 +145,6 @@ class Executor : public cSimpleModule {
         FINDING = FSM_Transient(1),
     };
 protected:
-    virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
 
 public:
@@ -152,6 +154,7 @@ public:
         delete scanMessage;
         delete waitMessage;
     };
+    void initialize() override;
 };
 
 Define_Module(Executor);

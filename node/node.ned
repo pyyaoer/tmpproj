@@ -32,10 +32,11 @@ module Edge extends Node {
         inout executor_port[exe_n];
     submodules:
         executor[exe_n]: Executor;
-    connections:
+    connections allowunconnected:
         for i=0..exe_n-1 {
-            executor[i].host_port <--> executor_port[i];
+	        executor_port[i] <--> executor[i].host_port;
         }
+
 }
 
 simple PNodeBase extends Node {

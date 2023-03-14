@@ -12,9 +12,17 @@ void Executor::initialize() {
 }
 
 void Executor::handleMessage(cMessage *msg) {
+    ExeActMessage *emsg;
     FSM_Switch(fsm) {
         case FSM_Exit(INIT):
-            FSM_Goto(fsm, WAITING);
+            emsg = check_and_cast<ExeActMessage *>(msg);
+            if (emsg->getType() == EXEACT_MESSAGE) {
+                FSM_Goto(fsm, WAITING);
+            }
+            else {
+                throw cRuntimeError("invalid event in executor state INIT");
+            }
+            delete msg;
             break;
 
         case FSM_Enter(WAITING):
@@ -26,23 +34,21 @@ void Executor::handleMessage(cMessage *msg) {
             break;
 
         case FSM_Enter(RUNNING):
-            scheduleAt(simTime() + duration, doneMessage);
             break;
 
         case FSM_Exit(RUNNING):
-            // transition to either SEND or SLEEP
             if (msg == doneMessage) {
                 cancelEvent(doneMessage);
                 FSM_Goto(fsm, WAITING);
             }
             else
-                throw cRuntimeError("invalid event in state RUNNING");
+                throw cRuntimeError("invalid event in executor state RUNNING");
             break;
 
         case FSM_Exit(FINDING): {
-
             if (true) {
                 cancelEvent(scanMessage);
+                scheduleAt(simTime() + duration, doneMessage);
                 FSM_Goto(fsm, RUNNING);
             }
             else {

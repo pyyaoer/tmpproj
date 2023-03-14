@@ -3,7 +3,7 @@ enum MessageType {
     COMP_MESSAGE = 2;
     SYNC_MESSAGE = 3;
     TAG_MESSAGE = 4;
-    EXECUTOR_MESSAGE = 5;
+    EXEACT_MESSAGE = 5;
 }
 
 packet BaseMessage {
@@ -31,6 +31,5 @@ packet TagMessage extends BaseMessage {
     double delta[32];
 }
 
-packet ExecutorMessage extends BaseMessage {
-    double duration;
+packet ExeActMessage extends BaseMessage {
 }

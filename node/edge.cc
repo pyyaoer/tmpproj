@@ -21,6 +21,14 @@ void Edge::initialize() {
     syncTime = &par("syncTime");
     syncMessage = new cMessage("syncMessage");
 
+    int num_executors = par("exe_n").intValue();
+    simtime_t t = simTime();
+    for (int i = 0; i < num_executors; ++i) {
+        ExeActMessage *msg = new ExeActMessage();
+        msg->setType(EXEACT_MESSAGE);
+        //send(msg, "executor_port$o", i);
+    }
+
     scheduleAt(0, syncMessage);
 }
 
@@ -98,3 +106,6 @@ void Edge::sync() {
     send(msg, "pnode_port$o");
 }
 
+int Edge::scan() {
+    return 0;
+}
