@@ -15,10 +15,6 @@ void Edge::initialize() {
     fsm.setName("fsm");
     fsm.setState(INIT);
 
-    for (int i = 0; i < TENANT_NUM; ++i) {
-        delta[i] = rho[i] = GATE_NUM;
-    }
-
     id = par("id").intValue();
     syncTime = &par("syncTime");
     syncMessage = new cMessage("syncMessage");
@@ -96,10 +92,6 @@ void Edge::processMessage(BaseMessage *msg) {
             break;
         case INFO_MESSAGE:
             imsg = check_and_cast<InfoMessage *>(msg);
-            for (i=0; i<TENANT_NUM; ++i) {
-                rho[i] = imsg->getRho(i);
-                delta[i] = imsg->getDelta(i);
-            }
             break;
         case EXE_SCAN_MESSAGE:
             etmsg = check_and_cast<ExeScanMessage *>(msg);
@@ -121,11 +113,6 @@ void Edge::sync() {
     msg->setType(SYNC_MESSAGE);
     msg->setGate_id(id);
     msg->setPeriod(syncTime->doubleValue());
-    for (int i=0; i<TENANT_NUM; ++i) {
-        msg->setR(i, r_req[i]);
-        msg->setL(i, l_req[i]);
-        r_req[i] = l_req[i] = 0;
-    }
     send(msg, "pnode_port$o");
 }
 

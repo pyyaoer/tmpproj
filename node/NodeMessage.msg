@@ -44,11 +44,7 @@ packet ExeDoneMessage extends BaseMessage {
 packet SyncMessage extends BaseMessage {
     int gate_id;
     double period;
-    int r[32];
-    int l[32];
 }
 
 packet InfoMessage extends BaseMessage {
-    double rho[32];
-    double delta[32];
 }

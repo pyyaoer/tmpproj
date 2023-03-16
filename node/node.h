@@ -60,10 +60,6 @@ class Edge : public Node {
         int gate;
     } Task;
 
-    double delta[TENANT_NUM];
-    double rho[TENANT_NUM];
-    double r_req[TENANT_NUM];
-    double l_req[TENANT_NUM];
     cPar *syncTime;
     cMessage *syncMessage;
     int exe_n;
@@ -101,8 +97,6 @@ Define_Module(Edge);
 class PNodeBase : public Node {
 
 protected:
-    std::vector<Records> record_r_;
-    std::vector<Records> record_l_;
 
     void sync(SyncMessage *smsg);
 
