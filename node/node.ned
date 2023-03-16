@@ -30,13 +30,6 @@ module Edge extends Node {
         inout iot_port[];
         inout pnode_port;
         inout executor_port[exe_n];
-    submodules:
-        executor[exe_n]: Executor;
-    connections allowunconnected:
-        for i=0..exe_n-1 {
-	        executor_port[i] <--> executor[i].host_port;
-        }
-
 }
 
 simple PNodeBase extends Node {
@@ -68,6 +61,7 @@ network m2Clock {
         int tenant_n = default(8);
         int iot_per_tenant = default(16);
         int iot_n = tenant_n * iot_per_tenant;
+        int exe_n = default(8);
     submodules:
         pnode: PNode {
             parameters:
@@ -85,8 +79,10 @@ network m2Clock {
         edge[edge_n]: Edge {
             parameters:
                 id = index;
+                exe_n = parent.exe_n;
             gates:
                 iot_port[parent.iot_n];
+                executor_port[parent.exe_n];
         }
         iot[iot_n]: IoT {
             parameters:

@@ -1,4 +1,4 @@
-#define FSM_DEBUG
+//#define FSM_DEBUG
 #include "node.h"
 
 Edge::Edge() : Node() {
@@ -23,10 +23,14 @@ void Edge::initialize() {
 
     int num_executors = par("exe_n").intValue();
     simtime_t t = simTime();
+    cModuleType *moduleType = cModuleType::get("node.Executor");
     for (int i = 0; i < num_executors; ++i) {
+        cModule *executor = moduleType->createScheduleInit("executor", this);
+        this->gate("executor_port$o", i)->connectTo(executor->gate("host_port$i"));
+        executor->gate("host_port$o")->connectTo(this->gate("executor_port$i", i));
         ExeActMessage *msg = new ExeActMessage();
         msg->setType(EXEACT_MESSAGE);
-        //send(msg, "executor_port$o", i);
+        send(msg, "executor_port$o", i);
     }
 
     scheduleAt(0, syncMessage);
