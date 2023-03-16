@@ -16,7 +16,6 @@ void SubPNode::handleMessage(cMessage *msg) {
 }
 
 void SubPNode::processMessage(BaseMessage *msg) {
-    SyncMessage *smsg;
     switch (msg->getType()) {
         case SYNC_MESSAGE:
             sync(check_and_cast<SyncMessage *>(msg));

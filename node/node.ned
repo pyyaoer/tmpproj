@@ -17,6 +17,7 @@ simple IoT extends Node {
         volatile double sleepTime @unit(s) = default(1s);
         volatile double burstTime @unit(s) = default(1s);
         volatile double sendIaTime @unit(s) = default(exponential(0.1s));
+        int tenant_id;
     gates:
         inout edge_port;
 }
@@ -51,8 +52,9 @@ simple PNode extends PNodeBase {
         inout subp_port[];
 }
 
-network m2Clock {
+network m2 {
     parameters:
+        @class(m2);
         int pnode_n = 1;
         int subp_n = default(4);
         int direct_edge_n = default(16);
@@ -87,6 +89,7 @@ network m2Clock {
         iot[iot_n]: IoT {
             parameters:
                 id = index;
+                tenant_id = id % parent.tenant_n;
         }
     connections allowunconnected:
         for i=0..subp_n-1 {

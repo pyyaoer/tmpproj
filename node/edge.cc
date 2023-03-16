@@ -80,7 +80,6 @@ void Edge::processMessage(BaseMessage *msg) {
     InfoMessage* imsg;
     ExeScanMessage* etmsg;
     ExeDoneMessage* edmsg;
-    int i;
     switch (msg->getType()) {
         case TASK_MESSAGE:
             tmsg = check_and_cast<TaskMessage *>(msg);
@@ -145,3 +144,4 @@ void Edge::done(int task_id) {
     cmsg->setCreation(t.creation);
     send(cmsg, "iot_port$o", t.gate);
 }
+

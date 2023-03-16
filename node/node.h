@@ -1,8 +1,23 @@
 #include <string.h>
 #include <queue>
+#include <exception>
 
 #include "util.h"
 #include "NodeMessage_m.h"
+
+
+class m2 : public cSimpleModule {
+protected:
+    std::vector<Latency> latency;
+    std::vector<cOutVector> lat_vec;
+    std::vector<cHistogram *> lat_hist;
+public:
+    m2() : latency(TENANT_NUM), lat_vec(TENANT_NUM), lat_hist(TENANT_NUM) {}
+    virtual void initialize() override;
+    void update_latency(int tenant_id, double latency_data);
+};
+
+Define_Module(m2);
 
 class Node : public cSimpleModule {
 protected:

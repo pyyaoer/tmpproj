@@ -16,7 +16,6 @@ void PNode::handleMessage(cMessage *msg) {
 }
 
 void PNode::processMessage(BaseMessage *msg) {
-    SyncMessage *smsg;
     switch (msg->getType()) {
         case SYNC_MESSAGE:
             sync(check_and_cast<SyncMessage *>(msg));

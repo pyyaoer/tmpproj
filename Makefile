@@ -37,6 +37,7 @@ OBJS = \
     $O/node/edge.o \
     $O/node/executor.o \
     $O/node/iot.o \
+    $O/node/m2.o \
     $O/node/pnode.o \
     $O/node/pnodebase.o \
     $O/node/subpnode.o \

@@ -15,7 +15,7 @@ void IoT::initialize() {
     fsm.setName("fsm");
 
     id = par("id").intValue();
-    tenant_id = par("id").intValue() % TENANT_NUM;
+    tenant_id = par("tenant_id").intValue();
 
     sleepTime = &par("sleepTime");
     burstTime = &par("burstTime");
@@ -54,7 +54,6 @@ void IoT::processTimer(cMessage *msg) {
             // schedule end of this burst
             d = burstTime->doubleValue();
             scheduleAt(simTime() + d, startStopBurst);
-            EV << "starting burst of duration " << d << "s\n";
 
             // transition to ACTIVE state:
             if (msg != startStopBurst)
@@ -65,7 +64,6 @@ void IoT::processTimer(cMessage *msg) {
         case FSM_Enter(ACTIVE):
             // schedule next sending
             d = sendIATime->doubleValue();
-            EV << "next sending in " << d << "s\n";
             scheduleAt(simTime() + d, sendMessage);
             break;
 
@@ -95,10 +93,15 @@ void IoT::processTimer(cMessage *msg) {
 
 void IoT::processMessage(BaseMessage *msg) {
     CompMessage *cmsg;
+    m2 *parent;
+    simtime_t latency;
     switch (msg->getType()) {
         case COMP_MESSAGE:
             cmsg = check_and_cast<CompMessage *>(msg);
-            EV << "Task completed in " << cmsg->getArrivalTime()-cmsg->getCreation() << " seconds.\n";
+            latency = cmsg->getArrivalTime()-cmsg->getCreation();
+            EV << "Task completed in " << latency << " seconds.\n";
+            parent = check_and_cast<m2 *>(getParentModule());
+            parent->update_latency(tenant_id, latency.dbl());
             break;
         default:
             break;
