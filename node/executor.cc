@@ -17,13 +17,14 @@ void Executor::initialize() {
     doneMessage = new cMessage();
     scanMessage = new cMessage();
 
-    scan_interval = SimTime(10, SIMTIME_US);
+    scan_interval = SimTime(10, SIMTIME_MS);
 }
 
 void Executor::handleMessage(cMessage *msg) {
     ExeActMessage *eamsg;
     ExeScanMessage *esmsg;
     ExeTaskMessage *etmsg;
+    ExeDoneMessage *edmsg;
     FSM_Switch(fsm) {
         case FSM_Exit(INIT):
             eamsg = check_and_cast<ExeActMessage *>(msg);
@@ -51,6 +52,10 @@ void Executor::handleMessage(cMessage *msg) {
         case FSM_Exit(RUNNING):
             if (msg == doneMessage) {
                 cancelEvent(doneMessage);
+                edmsg = new ExeDoneMessage();
+                edmsg->setType(EXE_DONE_MESSAGE);
+                edmsg->setTask_id(task_id);
+                send(edmsg, "host_port$o");
                 FSM_Goto(fsm, WAITING);
             }
             else 
@@ -69,6 +74,7 @@ void Executor::handleMessage(cMessage *msg) {
             if (etmsg->getType() != EXE_TASK_MESSAGE)
                 throw cRuntimeError("invalid event in executor state FINDING");
             if (etmsg->getSucc()) {
+                task_id = etmsg->getTask_id();
                 cancelEvent(scanMessage);
                 scheduleAt(simTime() + etmsg->getDuration(), doneMessage);
                 FSM_Goto(fsm, RUNNING);

@@ -1,4 +1,5 @@
 #include <string.h>
+#include <queue>
 
 #include "util.h"
 #include "NodeMessage_m.h"
@@ -34,6 +35,7 @@ class IoT : public Node {
 
 protected:
     int tenant_id;
+    double duration;
 
     virtual void handleMessage(cMessage *msg) override;
     virtual void processTimer(cMessage *msg);
@@ -50,7 +52,13 @@ public:
 Define_Module(IoT);
 
 class Edge : public Node {
-    friend class Executor;
+    typedef struct {
+        int task_id;
+        int tenant_id;
+        double duration;
+        simtime_t creation;
+        int gate;
+    } Task;
 
     double delta[TENANT_NUM];
     double rho[TENANT_NUM];
@@ -68,6 +76,10 @@ class Edge : public Node {
         SYNC = FSM_Transient(1),
     };
 
+    int task_counter;
+    std::queue<Task> todo_;
+    std::vector<Task> doing_;
+
 protected:
 
     virtual void handleMessage(cMessage *msg) override;
@@ -75,7 +87,8 @@ protected:
     void processMessage(BaseMessage *msg);
 
     void sync();
-    int scan(int executor_id);
+    void scan(int executor_id);
+    void done(int task_id);
 
 public:
     Edge();
@@ -132,6 +145,7 @@ Define_Module(PNode);
 class Executor : public cSimpleModule {
 
     int executor_id;
+    int task_id;
 
     cMessage *doneMessage;
     cMessage *scanMessage;

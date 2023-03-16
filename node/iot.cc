@@ -1,8 +1,9 @@
-#define FSM_DEBUG
+//#define FSM_DEBUG
 #include "node.h"
 
 IoT::IoT() {
     startStopBurst = sendMessage = nullptr;
+    duration = 1;
 }
 
 IoT::~IoT() {
@@ -39,7 +40,7 @@ void IoT::processTimer(cMessage *msg) {
     FSM_Switch(fsm) {
         case FSM_Exit(INIT):
             // transition to SLEEP state
-            FSM_Goto(fsm, SLEEP);
+            FSM_Goto(fsm, ACTIVE);
             break;
 
         case FSM_Enter(SLEEP):
@@ -111,6 +112,7 @@ void IoT::generateTask() {
     msg->setType(TASK_MESSAGE);
     msg->setIot_id(id);
     msg->setTenant_id(tenant_id);
+    msg->setTask_duration(duration);
     send(msg, "edge_port$o");
 }
 

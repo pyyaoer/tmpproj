@@ -6,6 +6,7 @@ enum MessageType {
     EXE_ACT_MESSAGE = 5;
     EXE_SCAN_MESSAGE = 6;
     EXE_TASK_MESSAGE = 7;
+    EXE_DONE_MESSAGE = 8;
 }
 
 packet BaseMessage {
@@ -15,6 +16,7 @@ packet BaseMessage {
 packet TaskMessage extends BaseMessage {
     int iot_id;
     int tenant_id;
+    double task_duration;
 }
 
 packet CompMessage extends BaseMessage {
@@ -43,5 +45,10 @@ packet ExeScanMessage extends BaseMessage {
 
 packet ExeTaskMessage extends BaseMessage {
     int succ;
+    int task_id;
     double duration;
+}
+
+packet ExeDoneMessage extends BaseMessage {
+    int task_id;
 }

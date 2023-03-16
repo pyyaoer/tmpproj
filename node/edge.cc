@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 Edge::Edge() : Node() {
+    task_counter = 0;
     syncMessage = nullptr;
 }
 
@@ -82,10 +83,16 @@ void Edge::processMessage(BaseMessage *msg) {
     TaskMessage* tmsg;
     TagMessage* tgmsg;
     ExeScanMessage* etmsg;
+    ExeDoneMessage* edmsg;
     int i;
     switch (msg->getType()) {
         case TASK_MESSAGE:
             tmsg = check_and_cast<TaskMessage *>(msg);
+            todo_.push(Task({task_counter++,
+                             tmsg->getTenant_id(),
+                             tmsg->getTask_duration(),
+                             tmsg->getCreationTime(),
+                             tmsg->getArrivalGate()->getIndex()}));
             break;
         case TAG_MESSAGE:
             tgmsg = check_and_cast<TagMessage *>(msg);
@@ -97,6 +104,10 @@ void Edge::processMessage(BaseMessage *msg) {
         case EXE_SCAN_MESSAGE:
             etmsg = check_and_cast<ExeScanMessage *>(msg);
             scan(etmsg->getExecutor_id());
+            break;
+        case EXE_DONE_MESSAGE:
+            edmsg = check_and_cast<ExeDoneMessage *>(msg);
+            done(edmsg->getTask_id());
             break;
         default:
             EV << "unexpected message type " << msg->getType() << " in Edge\n";
@@ -118,11 +129,32 @@ void Edge::sync() {
     send(msg, "pnode_port$o");
 }
 
-int Edge::scan(int executor_id) {
+void Edge::scan(int executor_id) {
     ExeTaskMessage *msg = new ExeTaskMessage();
     msg->setType(EXE_TASK_MESSAGE);
-    msg->setSucc(1);
-    msg->setDuration(10);
+    msg->setSucc(0);
+    if (!todo_.empty()) {
+        Task t = todo_.front();
+        todo_.pop();
+        doing_.push_back(t);
+        msg->setSucc(1);
+        msg->setTask_id(t.task_id);
+        msg->setDuration(t.duration);
+    }
     send(msg, "executor_port$o", executor_id);
-    return 0;
+}
+
+void Edge::done(int task_id) {
+    Task t;
+    CompMessage* cmsg = new CompMessage();
+    for (auto i = doing_.begin(); i != doing_.end(); i++) {
+        if (i->task_id == task_id) {
+            t = *i;
+            doing_.erase(i);
+            break;
+        }
+    }
+    cmsg->setType(COMP_MESSAGE);
+    cmsg->setCreation(t.creation);
+    send(cmsg, "iot_port$o", t.gate);
 }
