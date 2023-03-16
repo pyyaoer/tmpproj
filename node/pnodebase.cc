@@ -10,8 +10,8 @@ PNodeBase::~PNodeBase() {
 void PNodeBase::sync(SyncMessage *smsg) {
     int gate_id = smsg->getGate_id();
     double period = smsg->getPeriod();
-    TagMessage * msg = new TagMessage();
-    msg->setType(TAG_MESSAGE);
+    InfoMessage * msg = new InfoMessage();
+    msg->setType(INFO_MESSAGE);
     for (int i = 0; i < TENANT_NUM; ++i) {
         int ri = smsg->getR(i);
         int li = smsg->getL(i);

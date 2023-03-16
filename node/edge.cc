@@ -81,7 +81,7 @@ void Edge::processTimer(cMessage *msg) {
 
 void Edge::processMessage(BaseMessage *msg) {
     TaskMessage* tmsg;
-    TagMessage* tgmsg;
+    InfoMessage* imsg;
     ExeScanMessage* etmsg;
     ExeDoneMessage* edmsg;
     int i;
@@ -94,11 +94,11 @@ void Edge::processMessage(BaseMessage *msg) {
                              tmsg->getCreationTime(),
                              tmsg->getArrivalGate()->getIndex()}));
             break;
-        case TAG_MESSAGE:
-            tgmsg = check_and_cast<TagMessage *>(msg);
+        case INFO_MESSAGE:
+            imsg = check_and_cast<InfoMessage *>(msg);
             for (i=0; i<TENANT_NUM; ++i) {
-                rho[i] = tgmsg->getRho(i);
-                delta[i] = tgmsg->getDelta(i);
+                rho[i] = imsg->getRho(i);
+                delta[i] = imsg->getDelta(i);
             }
             break;
         case EXE_SCAN_MESSAGE:

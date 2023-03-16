@@ -6,7 +6,7 @@ enum MessageType {
     EXE_TASK_MESSAGE = 5;
     EXE_DONE_MESSAGE = 6;
     SYNC_MESSAGE = 7;
-    TAG_MESSAGE = 8;
+    INFO_MESSAGE = 8;
 }
 
 packet BaseMessage {
@@ -48,7 +48,7 @@ packet SyncMessage extends BaseMessage {
     int l[32];
 }
 
-packet TagMessage extends BaseMessage {
+packet InfoMessage extends BaseMessage {
     double rho[32];
     double delta[32];
 }
