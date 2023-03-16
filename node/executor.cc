@@ -1,22 +1,34 @@
 #include "node.h"
 
+Executor::Executor() {
+    doneMessage = nullptr;
+    scanMessage = nullptr;
+}
+
+Executor::~Executor() {
+    cancelAndDelete(doneMessage);
+    cancelAndDelete(scanMessage);
+}
+
 void Executor::initialize() {
     fsm.setName("fsm");
-    fsm.setState(WAITING);
+    fsm.setState(INIT);
 
     doneMessage = new cMessage();
     scanMessage = new cMessage();
-    waitMessage = new cMessage();
 
     scan_interval = SimTime(10, SIMTIME_US);
 }
 
 void Executor::handleMessage(cMessage *msg) {
-    ExeActMessage *emsg;
+    ExeActMessage *eamsg;
+    ExeScanMessage *esmsg;
+    ExeTaskMessage *etmsg;
     FSM_Switch(fsm) {
         case FSM_Exit(INIT):
-            emsg = check_and_cast<ExeActMessage *>(msg);
-            if (emsg->getType() == EXEACT_MESSAGE) {
+            eamsg = check_and_cast<ExeActMessage *>(msg);
+            if (eamsg->getType() == EXE_ACT_MESSAGE) {
+                executor_id = eamsg->getExecutor_id();
                 FSM_Goto(fsm, WAITING);
             }
             else {
@@ -41,19 +53,30 @@ void Executor::handleMessage(cMessage *msg) {
                 cancelEvent(doneMessage);
                 FSM_Goto(fsm, WAITING);
             }
-            else
+            else 
                 throw cRuntimeError("invalid event in executor state RUNNING");
             break;
 
+        case FSM_Enter(FINDING):
+            esmsg = new ExeScanMessage();
+            esmsg->setType(EXE_SCAN_MESSAGE);
+            esmsg->setExecutor_id(executor_id);
+            send(esmsg, "host_port$o");
+            break;
+
         case FSM_Exit(FINDING): {
-            if (true) {
+            etmsg = check_and_cast<ExeTaskMessage *>(msg);
+            if (etmsg->getType() != EXE_TASK_MESSAGE)
+                throw cRuntimeError("invalid event in executor state FINDING");
+            if (etmsg->getSucc()) {
                 cancelEvent(scanMessage);
-                scheduleAt(simTime() + duration, doneMessage);
+                scheduleAt(simTime() + etmsg->getDuration(), doneMessage);
                 FSM_Goto(fsm, RUNNING);
             }
             else {
                 FSM_Goto(fsm, WAITING);
             }
+            delete msg;
 
             break;
         }

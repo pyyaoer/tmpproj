@@ -3,7 +3,9 @@ enum MessageType {
     COMP_MESSAGE = 2;
     SYNC_MESSAGE = 3;
     TAG_MESSAGE = 4;
-    EXEACT_MESSAGE = 5;
+    EXE_ACT_MESSAGE = 5;
+    EXE_SCAN_MESSAGE = 6;
+    EXE_TASK_MESSAGE = 7;
 }
 
 packet BaseMessage {
@@ -32,4 +34,14 @@ packet TagMessage extends BaseMessage {
 }
 
 packet ExeActMessage extends BaseMessage {
+    int executor_id;
+}
+
+packet ExeScanMessage extends BaseMessage {
+    int executor_id;
+}
+
+packet ExeTaskMessage extends BaseMessage {
+    int succ;
+    double duration;
 }

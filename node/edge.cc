@@ -1,5 +1,6 @@
 //#define FSM_DEBUG
 #include "node.h"
+#include <stdio.h>
 
 Edge::Edge() : Node() {
     syncMessage = nullptr;
@@ -21,15 +22,17 @@ void Edge::initialize() {
     syncTime = &par("syncTime");
     syncMessage = new cMessage("syncMessage");
 
-    int num_executors = par("exe_n").intValue();
-    simtime_t t = simTime();
+    exe_n = par("exe_n").intValue();
     cModuleType *moduleType = cModuleType::get("node.Executor");
-    for (int i = 0; i < num_executors; ++i) {
-        cModule *executor = moduleType->createScheduleInit("executor", this);
+    for (int i = 0; i < exe_n; ++i) {
+        char name[20] = {0};
+        sprintf(name, "executor%d", i);
+        cModule *executor = moduleType->createScheduleInit(name, this);
         this->gate("executor_port$o", i)->connectTo(executor->gate("host_port$i"));
         executor->gate("host_port$o")->connectTo(this->gate("executor_port$i", i));
         ExeActMessage *msg = new ExeActMessage();
-        msg->setType(EXEACT_MESSAGE);
+        msg->setType(EXE_ACT_MESSAGE);
+        msg->setExecutor_id(i);
         send(msg, "executor_port$o", i);
     }
 
@@ -78,11 +81,11 @@ void Edge::processTimer(cMessage *msg) {
 void Edge::processMessage(BaseMessage *msg) {
     TaskMessage* tmsg;
     TagMessage* tgmsg;
+    ExeScanMessage* etmsg;
     int i;
     switch (msg->getType()) {
         case TASK_MESSAGE:
             tmsg = check_and_cast<TaskMessage *>(msg);
-            EV << id << " received task from IoT " << tmsg->getIot_id() << "\n";
             break;
         case TAG_MESSAGE:
             tgmsg = check_and_cast<TagMessage *>(msg);
@@ -91,7 +94,12 @@ void Edge::processMessage(BaseMessage *msg) {
                 delta[i] = tgmsg->getDelta(i);
             }
             break;
+        case EXE_SCAN_MESSAGE:
+            etmsg = check_and_cast<ExeScanMessage *>(msg);
+            scan(etmsg->getExecutor_id());
+            break;
         default:
+            EV << "unexpected message type " << msg->getType() << " in Edge\n";
             break;
     }
     delete msg;
@@ -110,6 +118,11 @@ void Edge::sync() {
     send(msg, "pnode_port$o");
 }
 
-int Edge::scan() {
+int Edge::scan(int executor_id) {
+    ExeTaskMessage *msg = new ExeTaskMessage();
+    msg->setType(EXE_TASK_MESSAGE);
+    msg->setSucc(1);
+    msg->setDuration(10);
+    send(msg, "executor_port$o", executor_id);
     return 0;
 }

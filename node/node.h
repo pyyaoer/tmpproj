@@ -58,6 +58,7 @@ class Edge : public Node {
     double l_req[TENANT_NUM];
     cPar *syncTime;
     cMessage *syncMessage;
+    int exe_n;
 
     // state
     cFSM fsm;
@@ -74,7 +75,7 @@ protected:
     void processMessage(BaseMessage *msg);
 
     void sync();
-    int scan();
+    int scan(int executor_id);
 
 public:
     Edge();
@@ -130,9 +131,10 @@ Define_Module(PNode);
 
 class Executor : public cSimpleModule {
 
+    int executor_id;
+
     cMessage *doneMessage;
     cMessage *scanMessage;
-    cMessage *waitMessage;
 
     simtime_t scan_interval;
     simtime_t duration;
@@ -142,18 +144,14 @@ class Executor : public cSimpleModule {
         INIT = 0,
         WAITING = FSM_Steady(1),
         RUNNING = FSM_Steady(2),
-        FINDING = FSM_Transient(1),
+        FINDING = FSM_Steady(3),
     };
 protected:
     virtual void handleMessage(cMessage *msg) override;
 
 public:
-    Executor() {};
-    ~Executor() {
-        delete doneMessage;
-        delete scanMessage;
-        delete waitMessage;
-    };
+    Executor();
+    ~Executor();
     void initialize() override;
 };
 
