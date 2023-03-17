@@ -2,7 +2,7 @@
 #include "node.h"
 #include <stdio.h>
 
-Edge::Edge() : Node() {
+Edge::Edge() : Node(), todo_(TENANT_NUM) {
     task_counter = 0;
     syncMessage = nullptr;
 }
@@ -83,11 +83,11 @@ void Edge::processMessage(BaseMessage *msg) {
     switch (msg->getType()) {
         case TASK_MESSAGE:
             tmsg = check_and_cast<TaskMessage *>(msg);
-            todo_.push(Task({task_counter++,
-                             tmsg->getTenant_id(),
-                             tmsg->getTask_duration(),
-                             tmsg->getCreationTime(),
-                             tmsg->getArrivalGate()->getIndex()}));
+            todo_[tmsg->getTenant_id()].push(Task({task_counter++,
+                                             tmsg->getTenant_id(),
+                                             tmsg->getTask_duration(),
+                                             tmsg->getCreationTime(),
+                                             tmsg->getArrivalGate()->getIndex()}));
             break;
         case INFO_MESSAGE:
             imsg = check_and_cast<InfoMessage *>(msg);
@@ -119,15 +119,33 @@ void Edge::scan(int executor_id) {
     ExeTaskMessage *msg = new ExeTaskMessage();
     msg->setType(EXE_TASK_MESSAGE);
     msg->setSucc(0);
-    if (!todo_.empty()) {
-        Task t = todo_.front();
-        todo_.pop();
+    Task t = schedule();
+    if (t.task_id >= 0) {
         doing_.push_back(t);
         msg->setSucc(1);
         msg->setTask_id(t.task_id);
         msg->setDuration(t.duration);
     }
     send(msg, "executor_port$o", executor_id);
+}
+
+Edge::Task Edge::schedule() {
+    // naive approach: select the oldest one
+    simtime_t first_task_t = simTime();
+    int first_task_tenant = -1;
+    for (int i = 0; i < TENANT_NUM; ++i) {
+        if (todo_[i].empty() or todo_[i].front().creation >= first_task_t)
+            continue;
+        first_task_t = todo_[i].front().creation;
+        first_task_tenant = i;
+    }
+    Task t;
+    t.task_id = -1;
+    if (first_task_tenant >= 0) {
+        t = todo_[first_task_tenant].front();
+        todo_[first_task_tenant].pop();
+    }
+    return t;
 }
 
 void Edge::done(int task_id) {

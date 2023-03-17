@@ -88,7 +88,7 @@ class Edge : public Node {
     };
 
     int task_counter;
-    std::queue<Task> todo_;
+    std::vector<std::queue<Task>> todo_;
     std::vector<Task> doing_;
 
 protected:
@@ -100,6 +100,7 @@ protected:
     void sync();
     void scan(int executor_id);
     void done(int task_id);
+    Task schedule();
 
 public:
     Edge();
