@@ -7,6 +7,8 @@ enum MessageType {
     EXE_DONE_MESSAGE = 6;
     SYNC_MESSAGE = 7;
     INFO_MESSAGE = 8;
+    SUBP_SYNC_MESSAGE = 9;
+    SUBP_INFO_MESSAGE = 10;
 }
 
 packet BaseMessage {
@@ -42,9 +44,17 @@ packet ExeDoneMessage extends BaseMessage {
 }
 
 packet SyncMessage extends BaseMessage {
-    int gate_id;
+    int edge_id;
     double period;
 }
 
 packet InfoMessage extends BaseMessage {
+}
+
+packet SubpSyncMessage extends BaseMessage {
+    int subp_id;
+    double period;
+}
+
+packet SubpInfoMessage extends BaseMessage {
 }

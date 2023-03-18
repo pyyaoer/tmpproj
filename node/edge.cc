@@ -16,7 +16,7 @@ void Edge::initialize() {
     fsm.setState(INIT);
 
     id = par("id").intValue();
-    syncTime = &par("syncTime");
+    sync_period = par("sync_period").doubleValue();
     syncMessage = new cMessage("syncMessage");
 
     exe_n = par("exe_n").intValue();
@@ -37,7 +37,6 @@ void Edge::initialize() {
 }
 
 void Edge::handleMessage(cMessage *msg) {
-    // process the self-message or incoming packet
     if (msg->isSelfMessage())
         processTimer(msg);
     else
@@ -45,30 +44,21 @@ void Edge::handleMessage(cMessage *msg) {
 }
 
 void Edge::processTimer(cMessage *msg) {
-    simtime_t d;
     FSM_Switch(fsm) {
         case FSM_Exit(INIT):
-            // transition to SLEEP state
             FSM_Goto(fsm, SLEEP);
             break;
 
         case FSM_Enter(SLEEP):
-            // schedule end of sleep period (start of next sync)
-            d = syncTime->doubleValue();
-            scheduleAt(simTime() + d, syncMessage);
+            scheduleAt(simTime() + sync_period, syncMessage);
             break;
 
         case FSM_Exit(SLEEP):
-            // schedule end of this burst
-            EV << "sync data with PNode\n";
             FSM_Goto(fsm, SYNC);
             break;
 
         case FSM_Exit(SYNC): {
-            // Sync with PNode
-            sync();
-
-            // return to SLEEP
+            sync_p();
             FSM_Goto(fsm, SLEEP);
             break;
         }
@@ -107,11 +97,11 @@ void Edge::processMessage(BaseMessage *msg) {
     delete msg;
 }
 
-void Edge::sync() {
+void Edge::sync_p() {
     SyncMessage *msg = new SyncMessage();
     msg->setType(SYNC_MESSAGE);
-    msg->setGate_id(id);
-    msg->setPeriod(syncTime->doubleValue());
+    msg->setEdge_id(id);
+    msg->setPeriod(sync_period);
     send(msg, "pnode_port$o");
 }
 

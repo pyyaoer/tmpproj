@@ -75,9 +75,9 @@ class Edge : public Node {
         int gate;
     } Task;
 
-    cPar *syncTime;
-    cMessage *syncMessage;
     int exe_n;
+    double sync_period;
+    cMessage *syncMessage;
 
     // state
     cFSM fsm;
@@ -97,7 +97,7 @@ protected:
     virtual void processTimer(cMessage *msg);
     void processMessage(BaseMessage *msg);
 
-    void sync();
+    void sync_p();
     void scan(int executor_id);
     void done(int task_id);
     Task schedule();
@@ -114,21 +114,36 @@ class PNodeBase : public Node {
 
 protected:
 
-    void sync(SyncMessage *smsg);
+    void sync_edge(SyncMessage *smsg);
 
 public:
     PNodeBase();
     virtual ~PNodeBase();
+    void initialize() override;
 };
 
 Define_Module(PNodeBase);
 
 class SubPNode : public PNodeBase {
 
+    double sync_period;
+    cMessage *syncMessage;
+
+    // state
+    cFSM fsm;
+    enum {
+        INIT = 0,
+        SLEEP = FSM_Steady(1),
+        SYNC = FSM_Transient(1),
+    };
+
 protected:
 
     virtual void handleMessage(cMessage *msg) override;
+    virtual void processTimer(cMessage *msg);
     void processMessage(BaseMessage *msg);
+
+    void sync_p();
 
 public:
     SubPNode();
@@ -143,6 +158,8 @@ class PNode : public PNodeBase {
 protected:
     virtual void handleMessage(cMessage *msg) override;
     void processMessage(BaseMessage *msg);
+
+    void sync_subp(SubpSyncMessage *smsg);
 
 public:
     PNode();
