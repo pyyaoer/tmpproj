@@ -113,7 +113,7 @@ Define_Module(Edge);
 class PNodeBase : public Node {
 
 protected:
-
+    int tenant_n;
     void sync_edge(SyncMessage *smsg);
 
 public:

@@ -27,6 +27,7 @@ module Edge extends Node {
         @class(Edge);
         volatile double sync_period @unit(s) = default(10s);
         int exe_n = default(8);
+        int tenant_n = default(8);
     gates:
         inout iot_port[];
         inout pnode_port;
@@ -34,6 +35,8 @@ module Edge extends Node {
 }
 
 simple PNodeBase extends Node {
+    parameters:
+        int tenant_n = default(8);
     gates:
         inout edge_port[];
 }
@@ -69,10 +72,11 @@ network m2 {
         double edge_sync_t @unit(s) = default(10s);
         double subp_sync_t @unit(s) = default(100s);
 
-        submodules:
+    submodules:
         pnode: PNode {
             parameters:
                 id = 0;
+                tenant_n = parent.tenant_n;
             gates:
                 edge_port[parent.edge_n];
                 subp_port[parent.subp_n];
@@ -80,6 +84,7 @@ network m2 {
         subp[subp_n]: SubPNode {
             parameters:
                 id = index;
+                tenant_n = parent.tenant_n;
                 sync_period = parent.subp_sync_t;
             gates:
                 edge_port[parent.edge_n];
@@ -88,6 +93,7 @@ network m2 {
             parameters:
                 id = index;
                 exe_n = parent.exe_n;
+                tenant_n = parent.tenant_n;
                 sync_period = parent.edge_sync_t;
             gates:
                 iot_port[parent.iot_n];

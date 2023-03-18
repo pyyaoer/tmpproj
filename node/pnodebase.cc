@@ -9,6 +9,7 @@ PNodeBase::~PNodeBase() {
 
 void PNodeBase::initialize() {
     id = par("id").intValue();
+    tenant_n = par("tenant_n").intValue();
 }
 
 void PNodeBase::sync_edge(SyncMessage *smsg) {
