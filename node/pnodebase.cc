@@ -9,6 +9,8 @@ PNodeBase::~PNodeBase() {
 
 void PNodeBase::initialize() {
     id = par("id").intValue();
+    r = par("r").doubleValue();
+    l = par("l").doubleValue();
     tenant_n = par("tenant_n").intValue();
 }
 

@@ -22,6 +22,8 @@ Define_Module(m2);
 class Node : public cSimpleModule {
 protected:
     int id;
+    double r;
+    double l;
     virtual void initialize() override {};
     virtual void handleMessage(cMessage *msg) override {};
 public:

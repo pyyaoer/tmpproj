@@ -3,6 +3,8 @@ package node;
 simple Node {
     parameters:
         int id;
+        double r;
+        double l;
         @display("i=block/routing");
 }
 
@@ -68,7 +70,10 @@ network m2 {
         int iot_per_tenant = default(16);
         int iot_n = tenant_n * iot_per_tenant;
         int exe_n = default(8);
-        
+
+        double r = default(iot_per_tenant * 0.9);
+        double l = default(iot_per_tenant * 1.1);
+
         double edge_sync_t @unit(s) = default(10s);
         double subp_sync_t @unit(s) = default(100s);
 
@@ -76,6 +81,8 @@ network m2 {
         pnode: PNode {
             parameters:
                 id = 0;
+                r = parent.r;
+                l = parent.l;
                 tenant_n = parent.tenant_n;
             gates:
                 edge_port[parent.edge_n];
@@ -84,6 +91,8 @@ network m2 {
         subp[subp_n]: SubPNode {
             parameters:
                 id = index;
+                r = parent.r;
+                l = parent.l;
                 tenant_n = parent.tenant_n;
                 sync_period = parent.subp_sync_t;
             gates:
@@ -92,6 +101,8 @@ network m2 {
         edge[edge_n]: Edge {
             parameters:
                 id = index;
+                r = parent.r;
+                l = parent.l;
                 exe_n = parent.exe_n;
                 tenant_n = parent.tenant_n;
                 sync_period = parent.edge_sync_t;
@@ -102,6 +113,8 @@ network m2 {
         iot[iot_n]: IoT {
             parameters:
                 id = index;
+                r = parent.r;
+                l = parent.l;
                 tenant_id = id % parent.tenant_n;
         }
     connections allowunconnected:
