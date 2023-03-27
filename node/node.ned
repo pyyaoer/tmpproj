@@ -76,6 +76,8 @@ network m2 {
 
         double edge_sync_t @unit(s) = default(10s);
         double subp_sync_t @unit(s) = default(100s);
+        
+        double window_size @unit(s) = default(1s);
 
     submodules:
         pnode: PNode {
