@@ -24,7 +24,7 @@ void IoT::initialize() {
     startStopBurst = new cMessage("startStopBurst");
     sendMessage = new cMessage("sendMessage");
 
-    scheduleAt(0, startStopBurst);
+    scheduleAt(simTime() + SimTime(tenant_id * 1000, SIMTIME_S), startStopBurst);
 }
 
 void IoT::handleMessage(cMessage *msg) {

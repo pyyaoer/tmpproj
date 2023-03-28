@@ -16,7 +16,7 @@ protected:
     double window_size;
 public:
     m2() : latency(TENANT_NUM), lat_vec(TENANT_NUM), lat_hist(TENANT_NUM),
-           iops_window(TENANT_NUM), iops_vec(TENANT_NUM) {}
+            iops_window(TENANT_NUM), iops_vec(TENANT_NUM) {}
     virtual void initialize() override;
     void update_latency(int tenant_id, double latency_data);
 };
@@ -77,13 +77,17 @@ public:
 Define_Module(IoT);
 
 class Edge : public Node {
-    typedef struct {
-        int task_id;
-        int tenant_id;
-        double duration;
-        simtime_t creation;
-        int iot;
-    } Task;
+
+    simtime_t r_last[TENANT_NUM];
+    simtime_t l_last[TENANT_NUM];
+
+    double delta[TENANT_NUM];
+    double rho[TENANT_NUM];
+    double r_req[TENANT_NUM];
+    double l_req[TENANT_NUM];
+
+    std::vector<VirtualTime> r_timeline;
+    std::vector<VirtualTime> l_timeline;
 
     int exe_n;
     double sync_period;
@@ -98,7 +102,8 @@ class Edge : public Node {
     };
 
     int task_counter;
-    std::vector<std::queue<Task>> todo_;
+    int last_scheduled_tenant;
+    std::vector<std::vector<Task>> todo_;
     std::vector<Task> doing_;
 
 protected:
@@ -111,6 +116,7 @@ protected:
     void scan(int executor_id);
     void done(int task_id);
     Task schedule();
+    void new_task(Task t);
 
 public:
     Edge();
@@ -123,7 +129,11 @@ Define_Module(Edge);
 class PNodeBase : public Node {
 
 protected:
+
+    std::vector<Records> record_r_;
+    std::vector<Records> record_l_;
     int tenant_n;
+
     void sync_edge(SyncMessage *smsg);
 
 public:
