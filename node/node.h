@@ -26,9 +26,13 @@ Define_Module(m2);
 class Node : public cSimpleModule {
 protected:
     int id;
-    double r;
-    double l;
-    virtual void initialize() override {};
+    std::vector<double> r;
+    std::vector<double> l;
+    virtual void initialize() override {
+        id = par("id").intValue();
+        r = cStringTokenizer(par("r").stdstringValue().c_str()).asDoubleVector();
+        l = cStringTokenizer(par("l").stdstringValue().c_str()).asDoubleVector();
+    };
     virtual void handleMessage(cMessage *msg) override {};
 public:
     Node() {}

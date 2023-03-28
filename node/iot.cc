@@ -12,9 +12,9 @@ IoT::~IoT() {
 }
 
 void IoT::initialize() {
+    Node::initialize();
     fsm.setName("fsm");
 
-    id = par("id").intValue();
     tenant_id = par("tenant_id").intValue();
 
     sleepTime = &par("sleepTime");

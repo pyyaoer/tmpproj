@@ -3,6 +3,18 @@
 
 using namespace omnetpp;
 
+static cValue repeat(cComponent *context, cValue argv[], int argc) {
+    std::string str = argv[0].stdstringValue() + " ";
+    int n = (int)argv[1];
+    std::string ret;
+    ret.reserve(str.size() * n);
+    while (n--)
+        ret += str;
+    return ret;
+}
+
+Define_NED_Function(repeat, "string repeat(string str, int n)");
+
 #define TENANT_NUM 8
 #define GATE_NUM 64
 #define EXECUTOR_NUM 16

@@ -12,12 +12,10 @@ Edge::~Edge() {
 }
 
 void Edge::initialize() {
+    Node::initialize();
     fsm.setName("fsm");
     fsm.setState(INIT);
 
-    id = par("id").intValue();
-    r = par("r").doubleValue();
-    l = par("l").doubleValue();
     sync_period = par("sync_period").doubleValue();
     syncMessage = new cMessage("syncMessage");
 
