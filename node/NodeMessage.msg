@@ -61,4 +61,5 @@ packet SubpSyncMessage extends BaseMessage {
 }
 
 packet SubpInfoMessage extends BaseMessage {
+    double scaling_factor;
 }

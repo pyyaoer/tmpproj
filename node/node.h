@@ -133,6 +133,7 @@ protected:
     std::vector<Records> record_r_;
     std::vector<Records> record_l_;
     int tenant_n;
+    double scaling_factor;
 
     void sync_edge(SyncMessage *smsg);
 
@@ -174,6 +175,8 @@ public:
 Define_Module(SubPNode);
 
 class PNode : public PNodeBase {
+
+    int subp_n;
 
 protected:
     virtual void handleMessage(cMessage *msg) override;

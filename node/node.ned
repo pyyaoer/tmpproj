@@ -54,6 +54,7 @@ simple SubPNode extends PNodeBase {
 simple PNode extends PNodeBase {
     parameters:
         @class(PNode);
+        int subp_n;
     gates:
         inout subp_port[];
 }
@@ -86,6 +87,7 @@ network m2 {
         pnode: PNode {
             parameters:
                 id = 0;
+                subp_n = parent.subp_n;
                 tenant_n = parent.tenant_n;
             gates:
                 edge_port[parent.edge_n];
