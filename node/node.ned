@@ -90,6 +90,7 @@ network m2 {
 
         int bucket_size = default(10);
         double leak_rate = default(10);
+
     submodules:
         pnode: PNode {
             parameters:
@@ -109,10 +110,10 @@ network m2 {
             parameters:
                 id = index;
                 tenant_n = parent.tenant_n;
-                sync_period = parent.subp_sync_t;
                 local_edge_n = parent.edge_per_subp;
                 bucket_size = parent.bucket_size;
                 local_leak_rate = parent.leak_rate / parent.edge_n * local_edge_n;
+                sync_period = parent.subp_sync_t;
             gates:
                 edge_port[parent.edge_n];
         }
