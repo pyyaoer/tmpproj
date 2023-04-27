@@ -127,12 +127,12 @@ Define_Module(Edge);
 
 class PNodeBase : public Node {
 
+protected:
+    int tenant_n;
     int local_edge_n;
     int bucket_size;
     double local_leak_rate;
 
-protected:
-    int tenant_n;
     void sync_edge(SyncMessage *smsg);
 
 public:
@@ -147,6 +147,9 @@ class SubPNode : public PNodeBase {
 
     double sync_period;
     cMessage *syncMessage;
+
+    std::vector<int> bucket_size_;
+    std::vector<double> leak_rate_;
 
     // state
     cFSM fsm;
@@ -173,6 +176,10 @@ public:
 Define_Module(SubPNode);
 
 class PNode : public PNodeBase {
+
+    int subp_n;
+    int leak_rate;
+    double local_leak_rate;
 
 protected:
     virtual void handleMessage(cMessage *msg) override;

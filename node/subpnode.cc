@@ -1,7 +1,7 @@
 #define FSM_DEBUG
 #include "node.h"
 
-SubPNode::SubPNode() : PNodeBase() {
+SubPNode::SubPNode() : PNodeBase(), bucket_size_(TENANT_NUM), leak_rate_(TENANT_NUM) {
     syncMessage = nullptr;
 }
 
@@ -29,12 +29,19 @@ void SubPNode::handleMessage(cMessage *msg) {
 
 void SubPNode::processMessage(BaseMessage *msg) {
     SubpInfoMessage *imsg;
+    int i;
     switch (msg->getType()) {
         case SYNC_MESSAGE:
             sync_edge(check_and_cast<SyncMessage *>(msg));
             break;
         case SUBP_INFO_MESSAGE:
             imsg = check_and_cast<SubpInfoMessage *>(msg);
+            for (i = 0; i < tenant_n; ++i) {
+                bucket_size_[i] = imsg->getBucket_size(i);
+                leak_rate_[i] = imsg->getLeak_rate(i);
+                if (leak_rate_[i] < 0.001)
+                    leak_rate_[i] = 0.001;
+            }
             break;
         default:
             break;

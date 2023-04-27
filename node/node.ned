@@ -95,7 +95,6 @@ network m2 {
         pnode: PNode {
             parameters:
                 id = 0;
-                tenant_n = parent.tenant_n;
                 local_edge_n = parent.direct_edge_n;
                 bucket_size = parent.bucket_size;
                 local_leak_rate = parent.leak_rate / parent.edge_n * local_edge_n;
@@ -114,7 +113,6 @@ network m2 {
                 local_edge_n = parent.edge_per_subp;
                 bucket_size = parent.bucket_size;
                 local_leak_rate = parent.leak_rate / parent.edge_n * local_edge_n;
-                tenant_n = parent.tenant_n;
                 sync_period = parent.subp_sync_t;
             gates:
                 edge_port[parent.edge_n];

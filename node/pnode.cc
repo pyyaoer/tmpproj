@@ -9,6 +9,8 @@ PNode::~PNode() {
 
 void PNode::initialize() {
     PNodeBase::initialize();
+    subp_n = par("subp_n").intValue();
+    leak_rate = par("leak_rate").doubleValue();
 }
 
 void PNode::handleMessage(cMessage *msg) {
@@ -33,5 +35,9 @@ void PNode::sync_subp(SubpSyncMessage *smsg) {
     int subp_id = smsg->getSubp_id();
     SubpInfoMessage * msg = new SubpInfoMessage();
     msg->setType(SUBP_INFO_MESSAGE);
+    for (int i = 0; i < tenant_n; ++i) {
+        msg->setBucket_size(i, bucket_size);
+        msg->setLeak_rate(i, (leak_rate - local_leak_rate) / subp_n);
+    }
     send(msg, "subp_port$o", subp_id);
 }
