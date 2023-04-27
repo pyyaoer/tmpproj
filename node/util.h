@@ -16,7 +16,7 @@ static cValue repeat(cComponent *context, cValue argv[], int argc) {
 Define_NED_Function(repeat, "string repeat(string str, int n)");
 
 #define TENANT_NUM 8
-#define GATE_NUM 64
+#define EDGE_NUM 64
 #define EXECUTOR_NUM 16
 
 typedef class Latency_t {

@@ -82,7 +82,7 @@ class Edge : public Node {
         int tenant_id;
         double duration;
         simtime_t creation;
-        int gate;
+        int iot;
     } Task;
 
     int exe_n;

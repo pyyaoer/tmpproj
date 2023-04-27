@@ -150,6 +150,6 @@ void Edge::done(int task_id) {
     }
     cmsg->setType(COMP_MESSAGE);
     cmsg->setCreation(t.creation);
-    send(cmsg, "iot_port$o", t.gate);
+    send(cmsg, "iot_port$o", t.iot);
 }
 
