@@ -9,6 +9,7 @@ enum MessageType {
     INFO_MESSAGE = 8;
     SUBP_SYNC_MESSAGE = 9;
     SUBP_INFO_MESSAGE = 10;
+    LEAK_MESSAGE = 101;
 }
 
 packet BaseMessage {
@@ -49,6 +50,8 @@ packet SyncMessage extends BaseMessage {
 }
 
 packet InfoMessage extends BaseMessage {
+    int bucket_size[32];
+    int leak_rate[32];
 }
 
 packet SubpSyncMessage extends BaseMessage {
@@ -57,4 +60,10 @@ packet SubpSyncMessage extends BaseMessage {
 }
 
 packet SubpInfoMessage extends BaseMessage {
+    int bucket_size[32];
+    int leak_rate[32];
+}
+
+packet LeakMessage extends BaseMessage {
+    int tenant_id;
 }

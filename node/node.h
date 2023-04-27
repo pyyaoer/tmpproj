@@ -88,6 +88,7 @@ class Edge : public Node {
     int exe_n;
     double sync_period;
     cMessage *syncMessage;
+    int tenant_n;
 
     // state
     cFSM fsm;
@@ -100,6 +101,10 @@ class Edge : public Node {
     int task_counter;
     std::vector<std::queue<Task>> todo_;
     std::vector<Task> doing_;
+
+    std::vector<int> bucket_;
+    std::vector<int> bucket_size_;
+    std::vector<double> leak_rate_;
 
 protected:
 
@@ -121,6 +126,10 @@ public:
 Define_Module(Edge);
 
 class PNodeBase : public Node {
+
+    int edge_n;
+    int bucket_size;
+    double leak_rate;
 
 protected:
     int tenant_n;

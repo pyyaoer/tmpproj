@@ -2,7 +2,8 @@
 #include "node.h"
 #include <stdio.h>
 
-Edge::Edge() : Node(), todo_(TENANT_NUM) {
+Edge::Edge() : Node(), todo_(TENANT_NUM), bucket_(TENANT_NUM, 0),
+               bucket_size_(TENANT_NUM), leak_rate_(TENANT_NUM) {
     task_counter = 0;
     syncMessage = nullptr;
 }
@@ -33,12 +34,32 @@ void Edge::initialize() {
         send(msg, "executor_port$o", i);
     }
 
+    tenant_n = par("tenant_n").intValue();
+    for (int i = 0; i < tenant_n; ++i) {
+        bucket_size_[i] = 1;
+        leak_rate_[i] = 10;
+        LeakMessage *msg = new LeakMessage();
+        msg->setType(LEAK_MESSAGE);
+        msg->setTenant_id(i);
+        scheduleAt(0, msg);
+    }
+
     scheduleAt(0, syncMessage);
 }
 
 void Edge::handleMessage(cMessage *msg) {
-    if (msg->isSelfMessage())
-        processTimer(msg);
+    // process the self-message or incoming packet
+    if (msg->isSelfMessage()) {
+        if (msg == syncMessage)
+            processTimer(msg);
+        else {
+            LeakMessage *lmsg = check_and_cast<LeakMessage *>(msg);
+            int tenant = lmsg->getTenant_id();
+            if (bucket_[tenant] < bucket_size_[tenant])
+                bucket_[tenant]++;
+            scheduleAt(simTime() + 1/leak_rate_[tenant], msg);
+        }
+    }
     else
         processMessage(check_and_cast<BaseMessage *>(msg));
 }
@@ -81,6 +102,12 @@ void Edge::processMessage(BaseMessage *msg) {
             break;
         case INFO_MESSAGE:
             imsg = check_and_cast<InfoMessage *>(msg);
+            for (int i = 0; i < tenant_n; ++i) {
+                bucket_size_[i] = imsg->getBucket_size(i);
+                leak_rate_[i] = imsg->getLeak_rate(i);
+                if (leak_rate_[i] < 0.001)
+                    leak_rate_[i] = 0.001;
+            }
             break;
         case EXE_SCAN_MESSAGE:
             etmsg = check_and_cast<ExeScanMessage *>(msg);
