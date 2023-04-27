@@ -13,6 +13,7 @@ void PNodeBase::initialize() {
     local_edge_n = par("local_edge_n").intValue();
     bucket_size = par("bucket_size").intValue();
     local_leak_rate = par("local_leak_rate").doubleValue();
+    tenant_n = par("tenant_n").intValue();
 }
 
 void PNodeBase::sync_edge(SyncMessage *smsg) {

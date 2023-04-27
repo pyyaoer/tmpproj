@@ -102,6 +102,7 @@ network m2 {
        			edge_n = parent.edge_n;
         		subp_n = parent.subp_n;
                 leak_rate = parent.leak_rate;
+                tenant_n = parent.tenant_n;
             gates:
                 edge_port[parent.edge_n];
                 subp_port[parent.subp_n];
@@ -113,6 +114,7 @@ network m2 {
                 local_edge_n = parent.edge_per_subp;
                 bucket_size = parent.bucket_size;
                 local_leak_rate = parent.leak_rate / parent.edge_n * local_edge_n;
+                tenant_n = parent.tenant_n;
                 sync_period = parent.subp_sync_t;
             gates:
                 edge_port[parent.edge_n];
