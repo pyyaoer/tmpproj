@@ -22,11 +22,11 @@ void PNodeBase::sync_edge(SyncMessage *smsg) {
         int ri = smsg->getR(i);
         int li = smsg->getL(i);
         if (ri >= 0) {
-            double n = record_r_[i].UpdateAndCount(edge_id, ri, period);
+            double n = record_r_[i].update_count(edge_id, ri, period);
             msg->setRho(i, (ri == 0) ? 0 : n / ri * scaling_factor);
         }
         if (li >= 0) {
-            double n = record_l_[i].UpdateAndCount(edge_id, li, period);
+            double n = record_l_[i].update_count(edge_id, li, period);
             msg->setDelta(i, (li == 0) ? 0 : n / li * scaling_factor);
         }
     }

@@ -20,25 +20,47 @@ Define_NED_Function(repeat, "string repeat(string str, int n)");
 #define EDGE_NUM 64
 #define EXECUTOR_NUM 16
 
+// TODO: Read the start time from syncmsg instead of using the current time
+// The lifetime should also be initialized properly (current : 10s)
 class Records {
     class Record {
     public:
+        simtime_t start;
         simtime_t period;
         double cnt;
-        Record() : Record(1, 0) {}
-        explicit Record(simtime_t p, int c)
-        : period(p), cnt(c) {}
+        Record() : Record(0, 1, 0) {}
+        explicit Record(simtime_t s, simtime_t p, int c)
+        : start(s), period(p), cnt(c) {}
     };
 public:
-    std::vector<Record> records;
-    explicit Records() : records(EDGE_NUM) {}
-    double UpdateAndCount(int edge_id, int cnt, double period) {
-        records[edge_id] = Record(period, cnt);
+    simtime_t lifetime;
+    std::vector<std::deque<Record>> records;
+    explicit Records() : records(EDGE_NUM), lifetime(SimTime(10, SIMTIME_S)) {}
+    double readonly_count(simtime_t start, simtime_t now) {
         double s = 0;
-        for (auto r : records) {
-            s += r.cnt / r.period;
+        for (auto dq : records) {
+            for (auto r : dq) {
+                if (start < r.start)
+                    s += r.cnt;
+                else if (start < r.start+r.period)
+                    s += r.cnt * ((r.start+r.period)-start) / r.period;
+            }
         }
-        return s * period;
+        // Bug but not fatal: the records are not sorted according start+period
+        // It may result in a longer deque but do not affect the scheduling result (currrently)
+        for (auto dq : records) {
+            while (!dq.empty()) {
+                auto it = dq.front();
+                if (it.start + it.period >= now - lifetime) break;
+                dq.pop_front();
+            }
+        }
+        return s;
+    }
+    double update_count(int edge_id, int cnt, double period) {
+        simtime_t now = simTime();
+        records[edge_id].push_back(Record(now-period, period, cnt));
+        return readonly_count(now-period, now);
     }
 };
 
