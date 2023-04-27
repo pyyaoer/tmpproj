@@ -127,9 +127,9 @@ Define_Module(Edge);
 
 class PNodeBase : public Node {
 
-    int edge_n;
+    int local_edge_n;
     int bucket_size;
-    double leak_rate;
+    double local_leak_rate;
 
 protected:
     int tenant_n;

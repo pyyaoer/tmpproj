@@ -39,9 +39,9 @@ module Edge extends Node {
 simple PNodeBase extends Node {
     parameters:
         int tenant_n = default(8);
-        int edge_n;
+        int local_edge_n;
         int bucket_size;
-        double leak_rate;
+        double local_leak_rate;
     gates:
         inout edge_port[];
 }
@@ -57,8 +57,9 @@ simple SubPNode extends PNodeBase {
 simple PNode extends PNodeBase {
     parameters:
         @class(PNode);
-        int edge_real_n;
+        int edge_n;
         int subp_n;
+        double leak_rate;
     gates:
         inout subp_port[];
 }
@@ -94,11 +95,12 @@ network m2 {
             parameters:
                 id = 0;
                 tenant_n = parent.tenant_n;
-                edge_n = parent.direct_edge_n;
+                local_edge_n = parent.direct_edge_n;
                 bucket_size = parent.bucket_size;
-                leak_rate = parent.leak_rate;
-       			edge_real_n = parent.edge_n;
+                local_leak_rate = parent.leak_rate / parent.edge_n * local_edge_n;
+       			edge_n = parent.edge_n;
         		subp_n = parent.subp_n;
+                leak_rate = parent.leak_rate;
             gates:
                 edge_port[parent.edge_n];
                 subp_port[parent.subp_n];
@@ -108,9 +110,9 @@ network m2 {
                 id = index;
                 tenant_n = parent.tenant_n;
                 sync_period = parent.subp_sync_t;
-                edge_n = parent.edge_per_subp;
+                local_edge_n = parent.edge_per_subp;
                 bucket_size = parent.bucket_size;
-                leak_rate = parent.leak_rate;
+                local_leak_rate = parent.leak_rate / parent.edge_n * local_edge_n;
             gates:
                 edge_port[parent.edge_n];
         }
