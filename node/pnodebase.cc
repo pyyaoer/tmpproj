@@ -1,7 +1,7 @@
 #define FSM_DEBUG
 #include "node.h"
 
-PNodeBase::PNodeBase() {
+PNodeBase::PNodeBase() : ratio_(TENANT_NUM) {
 }
 
 PNodeBase::~PNodeBase() {
@@ -19,9 +19,10 @@ void PNodeBase::initialize() {
 void PNodeBase::sync_edge(SyncMessage *smsg) {
     int edge_id = smsg->getEdge_id();
     InfoMessage * msg = new InfoMessage();
-    for (int i = 0; i < local_edge_n; ++i) {
+    for (int i = 0; i < tenant_n; ++i) {
+        double ratio = ratio_[i].UpdateAndGetRatio(edge_id, smsg->getCounter(i));
         msg->setBucket_size(i, bucket_size);
-        msg->setLeak_rate(i, local_leak_rate / local_edge_n);
+        msg->setLeak_rate(i, local_leak_rate * ratio);
     }
     msg->setType(INFO_MESSAGE);
     send(msg, "edge_port$o", edge_id);

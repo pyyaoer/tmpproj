@@ -105,6 +105,7 @@ class Edge : public Node {
     std::vector<int> bucket_;
     std::vector<int> bucket_size_;
     std::vector<double> leak_rate_;
+    std::vector<int> counter_;
 
 protected:
 
@@ -132,6 +133,8 @@ protected:
     int local_edge_n;
     int bucket_size;
     double local_leak_rate;
+
+    std::vector<Ratio> ratio_;
 
     void sync_edge(SyncMessage *smsg);
 

@@ -47,6 +47,7 @@ packet ExeDoneMessage extends BaseMessage {
 packet SyncMessage extends BaseMessage {
     int edge_id;
     double period;
+    int counter[32];
 }
 
 packet InfoMessage extends BaseMessage {

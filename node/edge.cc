@@ -3,7 +3,8 @@
 #include <stdio.h>
 
 Edge::Edge() : Node(), todo_(TENANT_NUM), bucket_(TENANT_NUM, 0),
-               bucket_size_(TENANT_NUM), leak_rate_(TENANT_NUM) {
+               bucket_size_(TENANT_NUM), leak_rate_(TENANT_NUM),
+               counter_(TENANT_NUM) {
     task_counter = 0;
     syncMessage = nullptr;
 }
@@ -36,6 +37,7 @@ void Edge::initialize() {
 
     tenant_n = par("tenant_n").intValue();
     for (int i = 0; i < tenant_n; ++i) {
+        counter_[i] = 0;
         bucket_size_[i] = 1;
         leak_rate_[i] = 10;
         LeakMessage *msg = new LeakMessage();
@@ -103,6 +105,7 @@ void Edge::processMessage(BaseMessage *msg) {
         case INFO_MESSAGE:
             imsg = check_and_cast<InfoMessage *>(msg);
             for (int i = 0; i < tenant_n; ++i) {
+                counter_[i] = 0;
                 bucket_size_[i] = imsg->getBucket_size(i);
                 leak_rate_[i] = imsg->getLeak_rate(i);
                 if (leak_rate_[i] < 0.001)
@@ -129,6 +132,9 @@ void Edge::sync_p() {
     msg->setType(SYNC_MESSAGE);
     msg->setEdge_id(id);
     msg->setPeriod(sync_period);
+    for (int i = 0; i < tenant_n; ++i) {
+        msg->setCounter(i, counter_[i]);
+    }
     send(msg, "pnode_port$o");
 }
 
@@ -177,6 +183,7 @@ void Edge::done(int task_id) {
     }
     cmsg->setType(COMP_MESSAGE);
     cmsg->setCreation(t.creation);
+    counter_[t.tenant_id] ++;
     send(cmsg, "iot_port$o", t.iot);
 }
 

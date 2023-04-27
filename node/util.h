@@ -36,3 +36,19 @@ public:
         return sum / lat.size();
     }
 } Latency;
+
+typedef class Ratio_t {
+    std::vector<int> past_;
+    double sum;
+public:
+    Ratio_t(): sum(0), past_(EDGE_NUM) {
+        for (auto &i : past_) {
+            i = 0;
+        }
+    }
+    double UpdateAndGetRatio(int index, int counter) {
+        sum += counter - past_[index];
+        past_[index] = counter;
+        return sum == 0 ? 0 : counter / sum;
+    }
+} Ratio;
