@@ -101,7 +101,6 @@ network m2 {
        			edge_n = parent.edge_n;
         		subp_n = parent.subp_n;
                 leak_rate = parent.leak_rate;
-                tenant_n = parent.tenant_n;
             gates:
                 edge_port[parent.edge_n];
                 subp_port[parent.subp_n];
