@@ -18,6 +18,7 @@ Define_NED_Function(repeat, "string repeat(string str, int n)");
 
 #define TENANT_NUM 8
 #define EDGE_NUM 64
+#define SUBP_NUM 16
 #define EXECUTOR_NUM 16
 
 // TODO: Read the start time from syncmsg instead of using the current time
@@ -47,7 +48,7 @@ public:
             }
         }
         // Bug but not fatal: the records are not sorted according start+period
-        // It may result in a longer deque but do not affect the scheduling result (currrently)
+        // It may result in a longer dequeue but do not affect the scheduling result (currently)
         for (auto dq : records) {
             while (!dq.empty()) {
                 auto it = dq.front();

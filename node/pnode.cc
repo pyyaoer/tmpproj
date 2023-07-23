@@ -35,6 +35,9 @@ void PNode::sync_subp(SubpSyncMessage *smsg) {
     SubpInfoMessage * msg = new SubpInfoMessage();
     msg->setType(SUBP_INFO_MESSAGE);
     //TODO: assign the right value for the scaling factor
-    msg->setScaling_factor(1 / subp_n);
+    for (int i = 0; i < TENANT_NUM; ++i) {
+        msg->setScaling_r(i, 1 / subp_n);
+        msg->setScaling_l(i, 1 / subp_n);
+    }
     send(msg, "subp_port$o", subp_id);
 }

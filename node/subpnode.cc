@@ -35,6 +35,10 @@ void SubPNode::processMessage(BaseMessage *msg) {
             break;
         case SUBP_INFO_MESSAGE:
             imsg = check_and_cast<SubpInfoMessage *>(msg);
+            for (int i = 0; i < TENANT_NUM; i++) {
+                scaling_r[i] = imsg->getScaling_r(i);
+                scaling_l[i] = imsg->getScaling_l(i);
+            }
             break;
         default:
             break;
@@ -69,5 +73,12 @@ void SubPNode::sync_p() {
     msg->setType(SUBP_SYNC_MESSAGE);
     msg->setSubp_id(id);
     msg->setPeriod(sync_period);
+    simtime_t now = simTime();
+    for (int i = 0; i < TENANT_NUM; i++) {
+        //TODO
+        msg->setR(i, record_r_[i].readonly_count(now - sync_period, now));
+        msg->setL(i, record_l_[i].readonly_count(now - sync_period, now));
+    }
+
     send(msg, "pnode_port$o");
 }

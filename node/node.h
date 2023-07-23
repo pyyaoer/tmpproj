@@ -132,8 +132,11 @@ protected:
 
     std::vector<Records> record_r_;
     std::vector<Records> record_l_;
+    std::vector<Records> record_sub_r_;
+    std::vector<Records> record_sub_l_;
     int tenant_n;
-    double scaling_factor;
+    double scaling_r[TENANT_NUM];
+    double scaling_l[TENANT_NUM];
 
     void sync_edge(SyncMessage *smsg);
 

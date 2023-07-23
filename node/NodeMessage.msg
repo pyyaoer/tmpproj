@@ -58,8 +58,11 @@ packet InfoMessage extends BaseMessage {
 packet SubpSyncMessage extends BaseMessage {
     int subp_id;
     double period;
+    int r[32];
+    int l[32];
 }
 
 packet SubpInfoMessage extends BaseMessage {
-    double scaling_factor;
+    double scaling_r[32];
+    double scaling_l[32];
 }
