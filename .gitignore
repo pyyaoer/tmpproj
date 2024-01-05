@@ -4,3 +4,4 @@ results
 */*_m.cc
 */*_m.h
 .vscode
+*.anf

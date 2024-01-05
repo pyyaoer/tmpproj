@@ -47,7 +47,7 @@ void IoT::processTimer(cMessage *msg) {
             // schedule end of sleep period (start of next burst)
             d = sleepTime->doubleValue();
             scheduleAt(simTime() + d, startStopBurst);
-            EV << "sleeping for " << d << "s\n";
+            //EV << "sleeping for " << d << "s\n";
             break;
 
         case FSM_Exit(SLEEP):
@@ -99,9 +99,9 @@ void IoT::processMessage(BaseMessage *msg) {
         case COMP_MESSAGE:
             cmsg = check_and_cast<CompMessage *>(msg);
             latency = cmsg->getArrivalTime()-cmsg->getCreation();
-            EV << "Task completed in " << latency << " seconds.\n";
+            // EV << "Task completed in " << latency << " seconds.\n";
             parent = check_and_cast<m2 *>(getParentModule());
-            parent->update_latency(tenant_id, latency.dbl());
+            parent->update_latency(tenant_id, latency.dbl(), cmsg->getArrivalTime().dbl());
             break;
         default:
             break;

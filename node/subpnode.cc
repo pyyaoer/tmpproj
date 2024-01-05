@@ -75,7 +75,7 @@ void SubPNode::sync_p() {
     msg->setPeriod(sync_period);
     simtime_t now = simTime();
     for (int i = 0; i < TENANT_NUM; i++) {
-        //TODO
+        //TODO: assign proper factor for subpnodes
         msg->setR(i, record_r_[i].readonly_count(now - sync_period, now));
         msg->setL(i, record_l_[i].readonly_count(now - sync_period, now));
     }

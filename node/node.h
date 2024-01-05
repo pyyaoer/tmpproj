@@ -18,7 +18,7 @@ public:
     m2() : latency(TENANT_NUM), lat_vec(TENANT_NUM), lat_hist(TENANT_NUM),
             iops_window(TENANT_NUM), iops_vec(TENANT_NUM) {}
     virtual void initialize() override;
-    void update_latency(int tenant_id, double latency_data);
+    void update_latency(int tenant_id, double latency_data, double arrival_time);
 };
 
 Define_Module(m2);

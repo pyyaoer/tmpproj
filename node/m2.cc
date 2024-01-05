@@ -3,11 +3,13 @@
 void m2::initialize() {
     window_size = par("window_size").doubleValue();
     for (int i = 0; i < TENANT_NUM; ++i) {
-        lat_hist[i] = new cHistogram();
+        char hist_name[100] = {0};
+        sprintf(hist_name, "Latency distribution of tenant %d", i);
+        lat_hist[i] = new cHistogram(hist_name);
     }
 }
 
-void m2::update_latency(int tenant_id, double latency_data) {
+void m2::update_latency(int tenant_id, double latency_data, double arrival_time) {
     latency[tenant_id].push(latency_data);
     lat_vec[tenant_id].record(latency[tenant_id].get());
     lat_hist[tenant_id]->collect(latency[tenant_id].get());
@@ -18,4 +20,9 @@ void m2::update_latency(int tenant_id, double latency_data) {
         iops_window[tenant_id].pop();
     }
     iops_vec[tenant_id].record(iops_window[tenant_id].size() / window_size);
+    //TODO: add a figure of granularity-accuracy
+    double granularity_unit = 1;
+    for (int i = 0; i < 5; i ++) {
+        granularity_unit *= 2;
+    }
 }
